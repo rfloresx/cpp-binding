@@ -3,14 +3,10 @@
 
 namespace Test {
 
-void CPoint4D::add(
-    CPoint4D p)
+void CPoint4D::add(CPoint4D p)
 {
-/* $begin(add) */
+    /* Insert Implementation*/
 
-    /* Insert implementation */
-
-/* $end */
 }
 
 }

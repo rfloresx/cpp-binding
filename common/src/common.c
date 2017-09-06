@@ -1,125 +1,86 @@
 
-#include "corto/gen/cpp/common/common.h"
+#include "driver/gen/cpp/common/common.h"
 
 corto_bool cpp_classToUpper = FALSE;
 
-static corto_bool cpp_cRequiresPtr(corto_type t, cpp_context context, corto_bool isRef) {
-    if (t->reference) {
-        return FALSE;
-    } else if (context == Cpp_Parameter) {
-        if ((t->kind == CORTO_COMPOSITE) ||
-           ((t->kind == CORTO_COLLECTION) && (corto_collection(t)->kind == CORTO_ARRAY)))
-        {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    } else if (context == Cpp_Return) {
-        return isRef;
-    }
-
-    return FALSE;
-}
-
-char* cpp_typeIdFromStr(g_generator g, char *typeName, cpp_context context, corto_id buffer) {
-
-    switch(context) {
-    case Cpp_Member:
-    case Cpp_Parameter:
-    case Cpp_Return:
-    case Cpp_Class:
-        sprintf(buffer, "C%s", typeName);
-        break;
-    case Cpp_ClassRef:
-        sprintf(buffer, "%sRef", typeName);
-        break;
-    case Cpp_ClassVal:
-        sprintf(buffer, "%sVal", typeName);
-        break;
-    case Cpp_TemplateFactory:
-        sprintf(buffer, "T%s", typeName);
-        break;
-    case Cpp_ClassFactory:
-    default:
-        strcpy(buffer, typeName);
-        break;
-    }
-
-    return buffer;
-}
-
-
-char* cpp_typeIdIntern(g_generator g, corto_type t, cpp_context context, cpp_refKind refKind, corto_bool fullpath, corto_id buffer)
+static char* cpp_typeIdIntern(
+    g_generator g, 
+    corto_type t, 
+    cpp_context context, 
+    cpp_refKind refKind, 
+    corto_bool fullpath, 
+    corto_id buffer)
 {
-    corto_id typeName;
-    corto_bool complex = FALSE;
-
     if (t->kind == CORTO_PRIMITIVE) {
-        c_primitiveId(g, corto_primitive(t), typeName);
-    } else if ((t->kind == CORTO_VOID) && !t->reference) {
-        strcpy(typeName, "void");
-    } else {
-        if (fullpath) {
-            corto_path(typeName, g_getCurrent(g), t, "::");
+        corto_primitive p = corto_primitive(t);
+        if (p->kind == CORTO_TEXT && context != Cpp_CType) {
+            // use std::string for CORTO_TEXT and does not ask for CType
+            strcpy(buffer, "::std::string");
         } else {
-            strcpy(typeName, corto_idof(t));
+            c_primitiveId(g, p, buffer);
         }
-        complex = TRUE;
-    }
-
-    if (complex && ((refKind == Cpp_ByCRef) || (refKind == Cpp_ByCVal))) {
-        sprintf(buffer, "%s::%s", cpp_cprefix(), corto_path(NULL, g_getCurrent(g), t, "::"));
-        if (cpp_cRequiresPtr(t, context, refKind == Cpp_ByCRef)) {
-            strcat(buffer, "*");
-        }
+    } else if (cpp_isVoid(t)) {
+        strcpy(buffer, "void");
+    } else if (t->kind == CORTO_COLLECTION) {
+        strcpy(buffer, "void*"); // TODO: 
+    } else if (t->kind == CORTO_ITERATOR) {
+        strcpy(buffer, "void*"); // TODO:
     } else {
-        if (complex) {
-            cpp_typeIdFromStr(g, typeName, context, buffer);
+        corto_id typeName;
+        switch (context) {
+            case Cpp_Class: {
+                if (refKind == Cpp_ById) {
+                    sprintf(typeName, "C%s", corto_idof(t));
+                } else if (refKind == Cpp_ByVal) {
+                    sprintf(typeName, "C%sVal", corto_idof(t));
+                } else if (refKind == Cpp_ByRef) {
+                    sprintf(typeName, "C%sRef", corto_idof(t));
+                }
+                break;
+            }
+            case Cpp_Template: {
+                sprintf(typeName, "T%s", corto_idof(t));
+                break;
+            }
+            case Cpp_CType: {
+                sprintf(typeName, "%s::%s", cpp_cprefix(), corto_idof(t));
+                if ((refKind == Cpp_ByRef) && !t->reference) {
+                    strcat(typeName, "*");
+                }
+                break;
+            }
+            default: {
+                strcpy(typeName, corto_idof(t));
+                break;
+            }
+        }
+                        
+        if (fullpath) {
+            corto_id scope;
+            //g_fullOid(g, corto_parentof(t), scope);
+            corto_path(scope, g_getCurrent(g), corto_parentof(t), "::");
+            if (strcmp(scope, ".")) {
+                sprintf(buffer, "%s::%s", scope, typeName);
+            } else {
+                sprintf(buffer, typeName);
+            }
         } else {
             strcpy(buffer, typeName);
         }
     }
-
-    return buffer;
-
-}
-
-char* _cpp_typeId(g_generator g, corto_type t, cpp_context context, corto_id buffer)
-{
-    return cpp_typeIdIntern(g, t, context, Cpp_ById, FALSE, buffer);
-}
-
-char* _cpp_typeFullId(g_generator g, corto_type t, cpp_context context, cpp_refKind refKind, corto_id buffer)
-{
-    return cpp_typeIdIntern(g, t, context, refKind, TRUE, buffer);
-}
-
-char* cpp_varId(g_generator g, corto_object o, corto_id buffer) {
-    corto_id cId;
-    c_varId(g, o, cId);
-    sprintf(buffer, "%s::%s", cpp_cprefix(), cId);
     return buffer;
 }
 
-char* cpp_mainheader(g_generator g, corto_id header) {
-    c_mainheader(g, header);
-    strcat(header, "pp");
-    return header;
+char* _cpp_typeId(g_generator g, corto_type t, cpp_context c, cpp_refKind r, corto_id b)
+{
+    return cpp_typeIdIntern(g, t, c, r, FALSE, b);
 }
 
-void cpp_include(g_generator g, g_file file, corto_object o) {
-    corto_id name;
-    corto_object package = c_findPackage(g, o);
-
-    corto_assert (package != NULL, "can't include '%s' from non-package scopes",
-        corto_fullpath(NULL, o));
-
-    c_includeFrom(
-      g,
-      file,
-      package,
-      c_filename(g, name, o, "hpp"));
+char* _cpp_typeFullId(g_generator g, corto_type t, cpp_context c, cpp_refKind r, corto_id b)
+{
+    return cpp_typeIdIntern(g, t, c, r, TRUE, b);
 }
+
 
 g_file cpp_headerOpen(g_generator g, corto_object o) {
     corto_id definedMacro;
@@ -168,9 +129,27 @@ void cpp_sourceClose(g_generator g, g_file file) {
     g_fileClose(file);
 }
 
+char* cpp_mainheader(g_generator g, corto_id header) {
+    c_mainheader(g, header);
+    strcat(header, "pp");
+    return header;
+}
+
+void cpp_include(g_generator g, g_file file, corto_object o) {
+    corto_id name;
+    corto_object package = c_findPackage(g, o);
+
+    corto_assert (package != NULL, "can't include '%s' from non-package scopes",
+        corto_fullpath(NULL, o));
+
+    c_includeFrom(
+      g,
+      file,
+      package,
+      c_filename(g, name, o, "hpp"));
+}
 /* Function builds a scope-stack from root to module */
-static void
-cpp_scopeStack(
+static void cpp_scopeStack(
     corto_object module,
     corto_object* stack /* corto_object[SD_MAX_SCOPE_DEPTH] */)
 {
@@ -204,8 +183,7 @@ cpp_scopeStack(
 }
 
 /* Find first common module in two module-stacks */
-static corto_object
-cpp_commonScope(
+static corto_object cpp_commonScope(
     corto_object from,
     corto_object to,
     corto_object* fromStack,
@@ -233,8 +211,7 @@ cpp_commonScope(
 }
 
 /* Check whether a type translates to a native construct or may act as a C++ namespace */
-corto_bool
-cpp_nativeType(corto_object o) {
+corto_bool cpp_nativeType(corto_object o) {
 	corto_bool result = FALSE;
 
 	if(corto_class_instanceof(corto_type_o, o)) {
@@ -254,8 +231,7 @@ cpp_nativeType(corto_object o) {
 }
 
 /* Open a scope */
-void
-cpp_openScope(
+void cpp_openScope(
     g_file file,
     corto_object to)
 {
@@ -324,4 +300,126 @@ void cpp_closeScope(g_file file) {
 
 char *cpp_cprefix(void) {
     return "types";
+}
+
+corto_int16 cpp_isVoid(corto_type t) {
+    return (t->kind == CORTO_VOID) && !t->reference;
+}
+
+
+// corto_int16 cpp_assignCTypeFromCppType(
+//     g_generator g,
+//     g_file file, 
+//     corto_type t,
+//     corto_bool ptr,
+//     corto_string lvalue,
+//     corto_string rvalue)
+// {
+//     if (t->kind == CORTO_PRIMITIVE) {
+//         corto_primitive p = corto_primitive(t);
+//         if (p->kind == CORTO_TEXT) {
+//             // strcpy({lvalue}, {rvalue}.str());
+//             g_fileWrite(file, "%s = corto_strdup(%s.c_str());\n", lvalue, rvalue);
+//         } else {
+//             // {lvalue} = {rvalue};
+//             g_fileWrite(file, "%s = %s\n", lvalue, rvalue);
+//         }
+//     } else if (cpp_isVoid(t)) {
+
+//     } else if (t->kind == CORTO_COLLECTION) {
+//         // TODO:
+//     } else if (t->kind == CORTO_ITERATOR) {
+//         // TODO:
+//     } else {
+//         if (t->reference) {
+//             g_fileWrite(file, "corto_ptr_setref(%s%s, %s.ptr());\n", ptr ? "" : "&", lvalue, rvalue);
+//         } else {
+//             if (ptr) {
+//                 //g_fileWrite(file, "corto_ptr_setref(%s%s, %s.ptr());\n", lvalue, rvalue);
+//             } else {
+//                 g_fileWrite(file, "%s = *%s.ptr();\n", lvalue, rvalue);
+//             }
+//         }
+//     }
+// }
+
+// corto_int16 cpp_assignCppTypeFromCType(
+//     g_generator g,
+//     g_file file, 
+//     corto_type t,
+//     corto_bool ptr,
+//     corto_string lvalue,
+//     corto_string rvalue)
+// {
+//     return 0;
+// }
+
+char* cpp_typeCastCppTypeToCType(
+    g_generator g,
+    corto_type t,
+    corto_string rvalue,
+    corto_string buffer)
+{
+    if (t->kind == CORTO_PRIMITIVE) {
+        corto_primitive p = corto_primitive(t);
+        if (p->kind == CORTO_TEXT) {
+            sprintf(buffer, "corto_strdup(%s.c_str())", rvalue);
+        } else {
+            sprintf(buffer, rvalue);
+        }
+    } else if (cpp_isVoid(t)) {
+
+    } else if (t->kind == CORTO_COLLECTION) {
+        // TODO:
+    } else if (t->kind == CORTO_ITERATOR) {
+        // TODO:
+    } else {
+        // 
+        corto_id cClassId;
+        cpp_typeFullId(g, t, Cpp_CType, Cpp_ByRef, cClassId);
+    
+        if (t->reference) {
+            sprintf(buffer, "(%s)(%s.ptr())", cClassId, rvalue);
+        } else {
+            sprintf(buffer, "*(%s)(%s.ptr())", cClassId, rvalue);
+        }
+    }
+
+    return buffer;
+}
+
+char* cpp_typeCastCTypeToCppType(
+    g_generator g,
+    corto_type t,
+    corto_bool ptr,
+    corto_string rvalue,
+    corto_string buffer)
+{
+    if (t->kind == CORTO_PRIMITIVE) {
+        corto_primitive p = corto_primitive(t);
+        if (p->kind == CORTO_TEXT) {
+            sprintf(buffer, "::std::string(%s%s)", ptr ? "" : "*", rvalue);
+        } else {
+            sprintf(buffer, "%s%s", ptr ? "" : "*", rvalue);
+        }
+    } else if (cpp_isVoid(t)) {
+
+    } else if (t->kind == CORTO_COLLECTION) {
+        // TODO:
+    } else if (t->kind == CORTO_ITERATOR) {
+        // TODO:
+    } else {
+        // 
+        corto_id classId, cTypeId;
+        cpp_typeFullId(g, t, Cpp_Class, Cpp_ById, classId);
+        cpp_typeFullId(g, t, Cpp_CType, Cpp_ById, cTypeId);
+        
+        if (t->reference) {
+            sprintf(buffer, "%s(%s)", classId, rvalue);
+        } else {
+            sprintf(buffer, "%s(%s%s, %s_o)", classId, ptr ? "" : "&", rvalue, cTypeId);
+        }
+    }
+
+    return buffer;
 }

@@ -3,7 +3,10 @@
 struct Point::
   x, y: int32
   void add(Point p)
-
+  Point foo()
+  string boo()
+  int32 what()
+  
 struct Point3D: Point::
   z: int32
   void add(Point3D p)

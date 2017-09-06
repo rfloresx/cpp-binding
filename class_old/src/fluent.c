@@ -1,7 +1,7 @@
 
-#include "corto/gen/c/common/common.h"
-#include "corto/gen/cpp/common/common.h"
-#include "corto/gen/cpp/class/class.h"
+#include "driver/gen/c/common/common.h"
+#include "driver/gen/cpp/common/common.h"
+#include "driver/gen/cpp/class/class.h"
 
 /* Add a fluent method (setter) for each member in the corto type */
 static corto_int16 cpp__fluent_visitMember(corto_walk_opt* s, corto_value *info, void *userData) {

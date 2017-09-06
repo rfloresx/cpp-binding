@@ -1,5 +1,5 @@
 
-PACKAGE = 'driver/gen/cpp/common'
+PACKAGE = 'driver/gen/cpp/api'
 
 NOCORTO = true
 USE_PACKAGE= ["corto", "corto/g", "driver/gen/c/common"]

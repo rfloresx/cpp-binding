@@ -3,13 +3,25 @@
 
 namespace Test {
 
-void CPoint::add(
-    CPoint p)
+void CPoint::add(CPoint p)
 {
-/* $begin(add) */
-    x(x() + p.x());
-    y(y() + p.y());
-/* $end */
+    /* Insert Implementation*/
+
+}
+::std::string CPoint::boo()
+{
+    /* Insert Implementation*/
+
+}
+CPoint CPoint::foo()
+{
+    /* Insert Implementation*/
+
+}
+int32_t CPoint::what()
+{
+    /* Insert Implementation*/
+
 }
 
 }
