@@ -57,6 +57,10 @@ TEST_EXPORT extern corto_member Test_Point4D_w_o;
 #ifdef BUILDING_TEST
 #define Point4D_w_o Test_Point4D_w_o
 #endif
+TEST_EXPORT extern corto_function Test_WHAT_o;
+#ifdef BUILDING_TEST
+#define WHAT_o Test_WHAT_o
+#endif
 TEST_EXPORT extern corto_method Test_Point4D_add_o;
 #ifdef BUILDING_TEST
 #define Point4D_add_o Test_Point4D_add_o
@@ -68,6 +72,18 @@ TEST_EXPORT extern corto_method Test_Point3D_add_o;
 TEST_EXPORT extern corto_method Test_Point_add_o;
 #ifdef BUILDING_TEST
 #define Point_add_o Test_Point_add_o
+#endif
+TEST_EXPORT extern corto_function Test_BOOO_o;
+#ifdef BUILDING_TEST
+#define BOOO_o Test_BOOO_o
+#endif
+TEST_EXPORT extern corto_function Test_Point_idk_o;
+#ifdef BUILDING_TEST
+#define Point_idk_o Test_Point_idk_o
+#endif
+TEST_EXPORT extern corto_function Test_WHATKL_o;
+#ifdef BUILDING_TEST
+#define WHATKL_o Test_WHATKL_o
 #endif
 
 #ifdef __cplusplus

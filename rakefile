@@ -1,9 +1,9 @@
 
 COMPONENTS = [] <<
-    "common" <<
-    "class" <<
-    "api" <<
-    "cpp"
-    # "cpp" <<
-
+    :common <<
+    :main <<
+    :class <<
+    :api << 
+    :cpp 
+    
 require "#{ENV['CORTO_BUILD']}/forward"

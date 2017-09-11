@@ -6,8 +6,14 @@
 
 namespace Test {
 
+namespace types {
+    typedef Test_Point4D Point4D;
+    static corto_struct& Point4D_o;
+}
+
 // Implementation of corto type /Test/Point4D
-class CPoint4D : public CPoint3D{
+class CPoint4D : public CPoint3D
+{
 public:
     // Getters/setters
     int32_t w() const;
@@ -20,3 +26,9 @@ public:
     
     // Constructs
     
+};
+
+}
+
+
+#endif

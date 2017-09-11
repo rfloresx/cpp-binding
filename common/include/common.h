@@ -21,6 +21,11 @@ cpp_refKind::
     Cpp_ByVal if Class -> C{Name}Ref; if CType {c_type}; else {cpp_context}
     Cpp_ByRef if Class -> C{Name}Val; if CType {c_type || c_type*}; else {cpp_context}
 */
+typedef enum cpp_idKind {
+    Cpp_Id,
+    Cpp_FullId,
+    Cpp_AbsoluteId
+} cpp_idKind;
 
 typedef enum cpp_context {
     Cpp_Class,
@@ -35,11 +40,9 @@ typedef enum cpp_refKind {
     Cpp_ByRef
 } cpp_refKind;
 
-char* _cpp_typeId(g_generator g, corto_type t, cpp_context context, cpp_refKind refKind, corto_id buffer);
-char* _cpp_typeFullId(g_generator g, corto_type t, cpp_context context, cpp_refKind refKind, corto_id buffer);
-
-#define cpp_typeId(g, t, context, refKind, buffer) _cpp_typeId(g, corto_type(t), context, refKind, buffer)
-#define cpp_typeFullId(g, t, context, refKind, buffer) _cpp_typeFullId(g, corto_type(t), context, refKind, buffer)
+char* cpp_objectId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
+char* cpp_objectFullId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
+char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
 
 g_file cpp_headerOpen(g_generator g, corto_object o);
 void cpp_headerClose(g_generator g, g_file file);
@@ -58,33 +61,12 @@ char *cpp_cprefix(void);
 
 corto_int16 cpp_isVoid(corto_type t);
 
-// corto_int16 cpp_assignCTypeFromCppType(
-//     g_generator g,
-//     g_file file, 
-//     corto_type t,
-//     corto_bool ptr,
-//     corto_string lvalue,
-//     corto_string rvalue);
-// corto_int16 cpp_assignCppTypeFromCType(
-//     g_generator g,
-//     g_file file, 
-//     corto_type t,
-//     corto_bool ptr,
-//     corto_string lvalue,
-//     corto_string rvalue);
-//
-char* cpp_typeCastCppTypeToCType(
-    g_generator g,
-    corto_type t,
-    corto_string rvalue,
-    corto_string buffer);
-//
-char* cpp_typeCastCTypeToCppType(
-    g_generator g,
-    corto_type t,
-    corto_bool ptr,
-    corto_string rvalue,
-    corto_string buffer);
+char* cpp_typeCastCppTypeToCType(g_generator g, corto_type t, corto_string rvalue, corto_string buffer);
+char* cpp_typeCastCTypeToCppType(g_generator g, corto_type t, corto_bool ptr, corto_string rvalue, corto_string buffer);
+
+corto_int16 cpp_walkProcedureParam(g_generator g, g_file file, corto_function f, corto_bool c);
+corto_int16 cpp_visitProcedure(g_generator g, g_file header, g_file source, corto_function f, corto_bool method);
+
 
 // char* cpp_typeIdFromStr(g_generator g, char *str, cpp_context context, corto_id buffer);
 // char* cpp_varId(g_generator g, corto_object o, corto_id buffer);

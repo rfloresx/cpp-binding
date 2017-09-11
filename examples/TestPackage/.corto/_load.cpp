@@ -11,6 +11,12 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+void _Test_BOOO(
+    Test_Point *p);
+
+#ifdef __cplusplus
+extern "C"
+#endif
 void _Test_Point_add(
     Test_Point* _this,
     Test_Point *p);
@@ -26,6 +32,11 @@ extern "C"
 #endif
 Test_Point _Test_Point_foo(
     Test_Point* _this);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+void _Test_Point_idk(void);
 
 #ifdef __cplusplus
 extern "C"
@@ -47,6 +58,17 @@ void _Test_Point4D_add(
     Test_Point4D* _this,
     Test_Point4D *p);
 
+#ifdef __cplusplus
+extern "C"
+#endif
+corto_mount _Test_WHAT(void);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+Test_Point _Test_WHATKL(
+    Test_Point *b);
+
 /* Variable definitions */
 corto_package Test_o;
 corto_struct Test_Point_o;
@@ -59,9 +81,13 @@ corto_struct Test_Point3D_o;
 corto_member Test_Point3D_z_o;
 corto_struct Test_Point4D_o;
 corto_member Test_Point4D_w_o;
+corto_function Test_WHAT_o;
 corto_method Test_Point4D_add_o;
 corto_method Test_Point3D_add_o;
 corto_method Test_Point_add_o;
+corto_function Test_BOOO_o;
+corto_function Test_Point_idk_o;
+corto_function Test_WHATKL_o;
 
 /* Load objects in object store. */
 int Test_load(void) {
@@ -85,7 +111,7 @@ int Test_load(void) {
         Test_o->version = NULL;
         Test_o->author = NULL;
         Test_o->description = NULL;
-        Test_o->env = corto_strdup("/home/rfloresx/.corto");
+        Test_o->env = corto_strdup("/Users/rfloresx/.corto");
         Test_o->language = NULL;
         Test_o->managed = TRUE;
         Test_o->noapi = FALSE;
@@ -250,6 +276,24 @@ int Test_load(void) {
         }
     }
 
+    Test_WHAT_o = corto_function(corto_declareChild(Test_o, "WHAT()", corto_function_o));
+    if (!Test_WHAT_o) {
+        corto_error("Test_load: failed to declare 'Test_WHAT_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_WHAT_o, CORTO_VALID)) {
+        Test_WHAT_o->returnType = corto_type(corto_resolve(NULL, "/corto/vstore/mount"));
+        Test_WHAT_o->returnsReference = TRUE;
+        
+        corto_function(Test_WHAT_o)->kind = CORTO_PROCEDURE_CDECL;
+        corto_function(Test_WHAT_o)->fptr = (corto_word)_Test_WHAT;
+        if (corto_define(Test_WHAT_o)) {
+            corto_error("Test_load: failed to define 'Test_WHAT_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
     Test_Point4D_add_o = corto_method(corto_declareChild(Test_Point4D_o, "add(/Test/Point4D p)", corto_method_o));
     if (!Test_Point4D_add_o) {
         corto_error("Test_load: failed to declare 'Test_Point4D_add_o' (%s)", corto_lasterr());
@@ -326,6 +370,42 @@ int Test_load(void) {
         corto_error("Test_load: calculated size '%d' of type 'Test_Point_o' doesn't match C-type size '%d'", corto_type(Test_Point_o)->size, sizeof(Test_Point));
     }
 
+    Test_BOOO_o = corto_function(corto_declareChild(Test_o, "BOOO(/Test/Point p)", corto_function_o));
+    if (!Test_BOOO_o) {
+        corto_error("Test_load: failed to declare 'Test_BOOO_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_BOOO_o, CORTO_VALID)) {
+        Test_BOOO_o->returnType = corto_type(corto_resolve(NULL, "void"));
+        Test_BOOO_o->returnsReference = FALSE;
+        
+        corto_function(Test_BOOO_o)->kind = CORTO_PROCEDURE_CDECL;
+        corto_function(Test_BOOO_o)->fptr = (corto_word)_Test_BOOO;
+        if (corto_define(Test_BOOO_o)) {
+            corto_error("Test_load: failed to define 'Test_BOOO_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    Test_Point_idk_o = corto_function(corto_declareChild(Test_Point_o, "idk()", corto_function_o));
+    if (!Test_Point_idk_o) {
+        corto_error("Test_load: failed to declare 'Test_Point_idk_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_Point_idk_o, CORTO_VALID)) {
+        Test_Point_idk_o->returnType = corto_type(corto_resolve(NULL, "void"));
+        Test_Point_idk_o->returnsReference = FALSE;
+        
+        corto_function(Test_Point_idk_o)->kind = CORTO_PROCEDURE_CDECL;
+        corto_function(Test_Point_idk_o)->fptr = (corto_word)_Test_Point_idk;
+        if (corto_define(Test_Point_idk_o)) {
+            corto_error("Test_load: failed to define 'Test_Point_idk_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
     if (!corto_checkState(Test_Point3D_o, CORTO_VALID)) {
         ((corto_type)Test_Point3D_o)->kind = CORTO_COMPOSITE;
         ((corto_type)Test_Point3D_o)->reference = FALSE;
@@ -368,6 +448,24 @@ int Test_load(void) {
 
     if (corto_type(Test_Point4D_o)->size != sizeof(Test_Point4D)) {
         corto_error("Test_load: calculated size '%d' of type 'Test_Point4D_o' doesn't match C-type size '%d'", corto_type(Test_Point4D_o)->size, sizeof(Test_Point4D));
+    }
+
+    Test_WHATKL_o = corto_function(corto_declareChild(Test_o, "WHATKL(/Test/Point b)", corto_function_o));
+    if (!Test_WHATKL_o) {
+        corto_error("Test_load: failed to declare 'Test_WHATKL_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_WHATKL_o, CORTO_VALID)) {
+        Test_WHATKL_o->returnType = corto_type((corto_claim(Test_Point_o), Test_Point_o));
+        Test_WHATKL_o->returnsReference = FALSE;
+        
+        corto_function(Test_WHATKL_o)->kind = CORTO_PROCEDURE_CDECL;
+        corto_function(Test_WHATKL_o)->fptr = (corto_word)_Test_WHATKL;
+        if (corto_define(Test_WHATKL_o)) {
+            corto_error("Test_load: failed to define 'Test_WHATKL_o' (%s)", corto_lasterr());
+            goto error;
+        }
     }
 
     if (_a_) {

@@ -1,0 +1,7 @@
+
+PACKAGE = 'driver/gen/cpp/main'
+
+NOCORTO = true
+USE_PACKAGE= ["corto", "corto/g", "driver/gen/c/common", "driver/gen/cpp/common"]
+
+require "#{ENV['CORTO_BUILD']}/package"

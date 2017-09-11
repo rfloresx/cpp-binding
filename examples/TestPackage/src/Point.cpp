@@ -3,22 +3,27 @@
 
 namespace Test {
 
-void CPoint::add(CPoint p)
+void Point::add(CPoint p)
 {
     /* Insert Implementation*/
 
 }
-::std::string CPoint::boo()
+::std::string Point::boo()
 {
     /* Insert Implementation*/
 
 }
-CPoint CPoint::foo()
+CPoint Point::foo()
 {
     /* Insert Implementation*/
 
 }
-int32_t CPoint::what()
+void Point::idk()
+{
+    /* Insert Implementation*/
+
+}
+int32_t Point::what()
 {
     /* Insert Implementation*/
 
