@@ -9,10 +9,10 @@
 #include <Test/Point4D.hpp>
 
 namespace Test {
-
-void BOOO(CPoint p);
-corto::vstore::Cmount WHAT();
-CPoint WHATKL(CPoint b);
+    
+    void BOOO(CPoint p);
+    corto::vstore::Cmount WHAT();
+    CPoint WHATKL(CPoint b);
 
 }
 

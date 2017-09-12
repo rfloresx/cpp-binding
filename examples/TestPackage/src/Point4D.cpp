@@ -1,13 +1,13 @@
 
 #include <Test/Test.hpp>
 
-namespace Test {
+using namespace Test;
 
-void Point4D::add(CPoint4D p)
+void CPoint4D::add(CPoint4D p)
 {
     /* Insert Implementation*/
 
 }
 
-}
+
 

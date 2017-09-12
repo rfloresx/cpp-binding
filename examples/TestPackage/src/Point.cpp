@@ -1,33 +1,37 @@
 
 #include <Test/Test.hpp>
 
-namespace Test {
+using namespace Test;
 
-void Point::add(CPoint p)
-{
-    /* Insert Implementation*/
-
-}
-::std::string Point::boo()
-{
-    /* Insert Implementation*/
-
-}
-CPoint Point::foo()
-{
-    /* Insert Implementation*/
-
-}
-void Point::idk()
-{
-    /* Insert Implementation*/
-
-}
-int32_t Point::what()
+void CPoint::add(CPoint p)
 {
     /* Insert Implementation*/
 
 }
 
+::std::string CPoint::boo()
+{
+    /* Insert Implementation*/
+
 }
+
+CPoint CPoint::foo()
+{
+    /* Insert Implementation*/
+
+}
+
+void CPoint::idk()
+{
+    /* Insert Implementation*/
+
+}
+
+int32_t CPoint::what()
+{
+    /* Insert Implementation*/
+
+}
+
+
 

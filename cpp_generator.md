@@ -1,23 +1,23 @@
+gen/c/project
+  _project.h
 
-```
-private_files:
-    gen/c/types
-    _types.h
-    _load.hpp
-    _load.cpp
-    _project.hpp ???
-    _project.cpp ???
+gen/c/type
+  _type.h
 
-```
-
-gen/c/types
-  create:
-    include/_types.h
+gen/c/load
+  _load.h
+  _load.cpp
 
 gen/cpp/main
-  create:
-    include/Name.hpp
-    src/Name.cpp
-    ./corto/_load.cpp
+  {pkg}.h
+  {pkg}.cpp
+  {pkg}.cpp
 
-gen/cpp/
+gen/cpp/class
+  {type}.hpp
+  {type}.cpp
+
+gen/cpp/api
+  {_api.cpp}
+  {pgk}/cpp : project 
+  

@@ -1,23 +1,32 @@
 
 #include <Test/Test.hpp>
 
-namespace Test {
+using namespace Test;
 
-void BOOO(CPoint p)
-{
-    /* Insert Implementation*/
-
-}
-corto::vstore::Cmount WHAT()
-{
-    /* Insert Implementation*/
-
-}
-CPoint WHATKL(CPoint b)
+void Test::BOOO(CPoint p)
 {
     /* Insert Implementation*/
 
 }
 
+corto::vstore::Cmount Test::WHAT()
+{
+    /* Insert Implementation*/
+
 }
+
+CPoint Test::WHATKL(CPoint b)
+{
+    /* Insert Implementation*/
+
+}
+
+int TestMain(int argc, char* argv[])
+{
+    
+/*TODO*/
+
+}
+
+
 

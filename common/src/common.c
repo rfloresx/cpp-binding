@@ -106,17 +106,20 @@ char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_context c, cpp_ref
     return cpp_objectIdIntern(g, o, c, r, Cpp_AbsoluteId, b);
 }
 
-g_file cpp_headerOpen(g_generator g, corto_object o) {
+g_file cpp_headerOpen(g_generator g, corto_object o, corto_id ext) {
     corto_id definedMacro;
     g_file result;
 
     corto_path(definedMacro, root_o, o, "_");
+    strcat(definedMacro, "_");
+    strcat(definedMacro, ext);
+
     corto_strupper(definedMacro);
 
-    result = g_fileOpen(g, "%s.hpp", corto_idof(o));
+    result = g_fileOpen(g, "%s.%s", corto_idof(o), ext);
     g_fileWrite(result, "\n");
-    g_fileWrite(result, "#ifndef %s_HPP\n", definedMacro);
-    g_fileWrite(result, "#define %s_HPP\n", definedMacro);
+    g_fileWrite(result, "#ifndef %s\n", definedMacro);
+    g_fileWrite(result, "#define %s\n", definedMacro);
     g_fileWrite(result, "\n");
 
     return result;
@@ -141,7 +144,8 @@ g_file cpp_sourceOpen(g_generator g, corto_object o) {
     cpp_include(g, result, g_getCurrent(g));
 
     g_fileWrite(result, "\n");
-    cpp_openScope(result, g_getCurrent(g));
+    cpp_useNamespace(g, result, g_getCurrent(g));
+    // cpp_openScope(result, g_getCurrent(g));
     g_fileWrite(result, "\n");
 
     return result;
@@ -252,6 +256,12 @@ corto_bool cpp_nativeType(corto_object o) {
 	}
 
 	return result;
+}
+
+void cpp_useNamespace(g_generator g, g_file file, corto_object to) {
+    corto_id scope;
+    cpp_objectAbsoluteId(g, to, Cpp_Type, Cpp_ById, scope);
+    g_fileWrite(file, "using namespace %s;\n", scope);
 }
 
 /* Open a scope */
@@ -506,8 +516,10 @@ corto_int16 cpp_visitProcedure(
 
     cpp_objectFullId(g, f->returnType, Cpp_Class, Cpp_ById, resultId);
     corto_signatureName(corto_idof(f), methodId);
-    cpp_objectFullId(g, f, Cpp_Type, Cpp_ById, methodFullId);
-    
+    cpp_objectFullId(g, corto_parentof(f), Cpp_Class, Cpp_ById, methodFullId);
+    strcat(methodFullId, "::");
+    strcat(methodFullId, methodId);
+
     if (method && !c_procedureHasThis(f)) {
         g_fileWrite(header, "static ");
     }
@@ -537,7 +549,7 @@ corto_int16 cpp_visitProcedure(
     }
     g_fileDedent(source);
 
-    g_fileWrite(source, "}\n");
+    g_fileWrite(source, "}\n\n");
 
     return 0;
 }

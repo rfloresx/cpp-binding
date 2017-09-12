@@ -1,0 +1,153 @@
+#include <Test/Test.hpp>
+
+// Implementation for CPoint
+extern corto_struct& Test::types::Point_o = Test_Point_o;
+
+int32_t Test::CPoint::x() const
+{
+    return int32_t{((Test::types::Point)this->ptr())->x};
+}
+void Test::CPoint::x(int32_t value)
+{
+    int32_t{((Test::types::Point)this->ptr())->x} = value;
+}
+int32_t Test::CPoint::y() const
+{
+    return int32_t{((Test::types::Point)this->ptr())->y};
+}
+void Test::CPoint::y(int32_t value)
+{
+    int32_t{((Test::types::Point)this->ptr())->y} = value;
+}
+
+extern "C" void Test_Point_add(Test_Point* _this, Test_Point* p)
+{
+    Test::CPoint _instance(_this);
+    Test::CPoint _p(p);
+    _instance.add(_p);
+}
+extern "C" corto_string Test_Point_boo(Test_Point* _this)
+{
+    Test::CPoint _instance(_this);
+    ::std::string result = _instance.boo();
+    return corto_strdup(result.c_str());
+}
+extern "C" Test_Point Test_Point_foo(Test_Point* _this)
+{
+    Test::CPoint _instance(_this);
+    Test::CPoint result = _instance.foo();
+    return *(types::Point*)(result.ptr());
+}
+extern "C" void Test_Point_idk()
+{
+    Test::CPoint::idk();
+}
+extern "C" int32_t Test_Point_what(Test_Point* _this)
+{
+    Test::CPoint _instance(_this);
+    int32_t result = _instance.what();
+    return result;
+}
+
+Test::CPoint& Test::CPoint::operator=(const Test::CPoint& other)
+{
+    return Test::CPoint::Base::operator=(other);
+}
+Test::CPoint& Test::CPoint::operator=(Test::CPoint&& other)
+{
+    return Test::CPoint::Base::operator=(other);
+}
+Test::CPoint& Test::CPoint::operator=(Test::types::Point* other)
+{
+    return Test::CPoint::Base::operator=(other);
+}
+
+Test::CPoint() : (null)::Base() {}
+Test::CPoint(const Test::CPoint& other) : Test::CPoint::Base(other) {}
+Test::CPoint(Test::CPoint&& other) : Test::CPoint::Base(std::move(other)) {}
+Test::CPoint(Test::types::Point* ref) : Test::CPoint::Base(ref) {}
+Test::CPoint(Test::types::Point val) : Test::types::Point::Base(&val, Test::CPoint_o) {}
+Test::CPoint(Test::types::Point* ref, ::corto::Type type) : Test::CPoint::Base(ref, type) {}
+Test::~CPoint(){}
+
+// Implementation for CPoint3D
+extern corto_struct& Test::types::Point3D_o = Test_Point3D_o;
+
+int32_t Test::CPoint3D::z() const
+{
+    return int32_t{((Test::types::Point3D)this->ptr())->z};
+}
+void Test::CPoint3D::z(int32_t value)
+{
+    int32_t{((Test::types::Point3D)this->ptr())->z} = value;
+}
+
+extern "C" void Test_Point3D_add(Test_Point3D* _this, Test_Point3D* p)
+{
+    Test::CPoint3D _instance(_this);
+    Test::CPoint3D _p(p);
+    _instance.add(_p);
+}
+
+Test::CPoint3D& Test::CPoint3D::operator=(const Test::CPoint3D& other)
+{
+    return Test::CPoint3D::Base::operator=(other);
+}
+Test::CPoint3D& Test::CPoint3D::operator=(Test::CPoint3D&& other)
+{
+    return Test::CPoint3D::Base::operator=(other);
+}
+Test::CPoint3D& Test::CPoint3D::operator=(Test::types::Point3D* other)
+{
+    return Test::CPoint3D::Base::operator=(other);
+}
+
+Test::CPoint3D() : (null)::Base() {}
+Test::CPoint3D(const Test::CPoint3D& other) : Test::CPoint3D::Base(other) {}
+Test::CPoint3D(Test::CPoint3D&& other) : Test::CPoint3D::Base(std::move(other)) {}
+Test::CPoint3D(Test::types::Point3D* ref) : Test::CPoint3D::Base(ref) {}
+Test::CPoint3D(Test::types::Point3D val) : Test::types::Point3D::Base(&val, Test::CPoint3D_o) {}
+Test::CPoint3D(Test::types::Point3D* ref, ::corto::Type type) : Test::CPoint3D::Base(ref, type) {}
+Test::~CPoint3D(){}
+
+// Implementation for CPoint4D
+extern corto_struct& Test::types::Point4D_o = Test_Point4D_o;
+
+int32_t Test::CPoint4D::w() const
+{
+    return int32_t{((Test::types::Point4D)this->ptr())->w};
+}
+void Test::CPoint4D::w(int32_t value)
+{
+    int32_t{((Test::types::Point4D)this->ptr())->w} = value;
+}
+
+extern "C" void Test_Point4D_add(Test_Point4D* _this, Test_Point4D* p)
+{
+    Test::CPoint4D _instance(_this);
+    Test::CPoint4D _p(p);
+    _instance.add(_p);
+}
+
+Test::CPoint4D& Test::CPoint4D::operator=(const Test::CPoint4D& other)
+{
+    return Test::CPoint4D::Base::operator=(other);
+}
+Test::CPoint4D& Test::CPoint4D::operator=(Test::CPoint4D&& other)
+{
+    return Test::CPoint4D::Base::operator=(other);
+}
+Test::CPoint4D& Test::CPoint4D::operator=(Test::types::Point4D* other)
+{
+    return Test::CPoint4D::Base::operator=(other);
+}
+
+Test::CPoint4D() : (null)::Base() {}
+Test::CPoint4D(const Test::CPoint4D& other) : Test::CPoint4D::Base(other) {}
+Test::CPoint4D(Test::CPoint4D&& other) : Test::CPoint4D::Base(std::move(other)) {}
+Test::CPoint4D(Test::types::Point4D* ref) : Test::CPoint4D::Base(ref) {}
+Test::CPoint4D(Test::types::Point4D val) : Test::types::Point4D::Base(&val, Test::CPoint4D_o) {}
+Test::CPoint4D(Test::types::Point4D* ref, ::corto::Type type) : Test::CPoint4D::Base(ref, type) {}
+Test::~CPoint4D(){}
+
+

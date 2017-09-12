@@ -27,7 +27,7 @@ struct Test_Point {
     int32_t y;
 };
 
-#ifdef BUILDING_TEST
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
 typedef Test_Point Point;
 #endif
 
@@ -39,7 +39,7 @@ struct Test_Point3D {
     int32_t z;
 };
 
-#ifdef BUILDING_TEST
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
 typedef Test_Point3D Point3D;
 #endif
 
@@ -51,7 +51,7 @@ struct Test_Point4D {
     int32_t w;
 };
 
-#ifdef BUILDING_TEST
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
 typedef Test_Point4D Point4D;
 #endif
 

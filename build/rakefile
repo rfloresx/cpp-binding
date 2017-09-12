@@ -1,0 +1,7 @@
+
+PACKAGE = 'driver/gen/cpp/build'
+
+NOCORTO = true
+USE_PACKAGE= []
+
+require "#{ENV['CORTO_BUILD']}/package"

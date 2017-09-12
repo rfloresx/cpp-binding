@@ -44,7 +44,7 @@ char* cpp_objectId(g_generator g, corto_object o, cpp_context context, cpp_refKi
 char* cpp_objectFullId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
 char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
 
-g_file cpp_headerOpen(g_generator g, corto_object o);
+g_file cpp_headerOpen(g_generator g, corto_object o, corto_id ext);
 void cpp_headerClose(g_generator g, g_file file);
 
 g_file cpp_sourceOpen(g_generator g, corto_object o);
@@ -54,6 +54,8 @@ char* cpp_mainheader(g_generator g, corto_id header);
 void cpp_include(g_generator g, g_file file, corto_object o);
 
 /* Open & close namespaces. Used for C++ compatibility */
+void cpp_useNamespace(g_generator g, g_file file, corto_object to);
+
 void cpp_openScope(g_file file, corto_object o);
 void cpp_closeScope(g_file file);
 
