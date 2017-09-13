@@ -50,7 +50,6 @@ static corto_int16 cpp_walkMetadata(corto_interface type, cpp_classWalk_t *data)
     return 0;
 }
 
-
 /* ******************
  * Members
  * ******************/
@@ -70,7 +69,7 @@ static corto_int16 cpp_visitMember(corto_walk_opt* s, corto_value *info, void *u
 
     cpp_objectAbsoluteId(data->g, t, Cpp_Class, Cpp_ById, memberType);
     cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_Class, Cpp_ById, classId);
-    cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_CType, Cpp_ById, cClassId);
+    cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_CType, Cpp_ByRef, cClassId);
 
     g_fileWrite(data->hiddenImpl, "%s %s::%s() const\n", memberType, classId, memberId);
     g_fileWrite(data->hiddenImpl, "{\n");
@@ -82,7 +81,17 @@ static corto_int16 cpp_visitMember(corto_walk_opt* s, corto_value *info, void *u
     g_fileWrite(data->hiddenImpl, "void %s::%s(%s value)\n", classId, memberId, memberType);
     g_fileWrite(data->hiddenImpl, "{\n");
     g_fileIndent(data->hiddenImpl);
-    g_fileWrite(data->hiddenImpl, "%s{((%s)this->ptr())->%s} = value;\n",memberType, cClassId, memberId);
+    
+    cpp_modifierMask mask = Cpp_NoCopy | ((t->kind == CORTO_PRIMITIVE) ? 0 : Cpp_Ptr);
+    corto_id cValue;
+    cpp_typeCastCppTypeToCType(data->g, t, mask, "value", cValue);
+
+    corto_id member;
+    sprintf(member, "((%s)this->ptr())->%s", cClassId, memberId);
+
+    cpp_apiAssign(data->g, data->hiddenImpl, t, Cpp_NoCopy, member, cValue);
+
+    //g_fileWrite(data->hiddenImpl, "%s{((%s)this->ptr())->%s} = value;\n",memberType, cClassId, memberId);
     g_fileDedent(data->hiddenImpl);
     g_fileWrite(data->hiddenImpl, "}\n");
 
@@ -177,6 +186,7 @@ static corto_int16 cpp_methodProxy(corto_function f, cpp_classWalk_t *data) {
             cpp_typeCastCppTypeToCType(
                 data->g,
                 f->returnType,
+                0,
                 "result",
                 buffer
             )
@@ -299,7 +309,7 @@ static corto_int16 cpp_classConstructs(corto_interface type, cpp_classWalk_t *da
     cpp_objectAbsoluteId(data->g, type, Cpp_CType, Cpp_ByRef, fullCType);
 
     g_fileWrite(data->header, "%s();\n", classId);
-    g_fileWrite(data->hiddenImpl, "%s() : %s::Base() {}\n", fullClassId);
+    g_fileWrite(data->hiddenImpl, "%s() : %s::Base() {}\n", fullClassId, fullClassId);
 
     g_fileWrite(data->header, "%s(const %s& other);\n", classId, classId);
     g_fileWrite(data->hiddenImpl, "%s(const %s& other) : %s::Base(other) {}\n", fullClassId, fullClassId, fullClassId);

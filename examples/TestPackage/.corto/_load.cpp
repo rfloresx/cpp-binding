@@ -81,6 +81,10 @@ corto_struct Test_Point3D_o;
 corto_member Test_Point3D_z_o;
 corto_struct Test_Point4D_o;
 corto_member Test_Point4D_w_o;
+corto_struct Test_Transform_o;
+corto_member Test_Transform_name_o;
+corto_member Test_Transform_position_o;
+corto_member Test_Transform_rotation_o;
 corto_function Test_WHAT_o;
 corto_method Test_Point4D_add_o;
 corto_method Test_Point3D_add_o;
@@ -276,6 +280,44 @@ int Test_load(void) {
         }
     }
 
+    Test_Transform_o = corto_struct(corto_declareChild(Test_o, "Transform", corto_struct_o));
+    if (!Test_Transform_o) {
+        corto_error("Test_load: failed to declare 'Test_Transform_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    Test_Transform_name_o = corto_member(corto_declareChild(Test_Transform_o, "name", corto_member_o));
+    if (!Test_Transform_name_o) {
+        corto_error("Test_load: failed to declare 'Test_Transform_name_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_Transform_name_o, CORTO_VALID)) {
+        Test_Transform_name_o->type = corto_type(corto_resolve(NULL, "string"));
+        Test_Transform_name_o->modifiers = 0x0;
+        Test_Transform_name_o->unit = NULL;
+        Test_Transform_name_o->state = 0x5;
+        Test_Transform_name_o->stateCondExpr = NULL;
+        Test_Transform_name_o->weak = FALSE;
+        Test_Transform_name_o->id = 2;
+        if (corto_define(Test_Transform_name_o)) {
+            corto_error("Test_load: failed to define 'Test_Transform_name_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    Test_Transform_position_o = corto_member(corto_declareChild(Test_Transform_o, "position", corto_member_o));
+    if (!Test_Transform_position_o) {
+        corto_error("Test_load: failed to declare 'Test_Transform_position_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    Test_Transform_rotation_o = corto_member(corto_declareChild(Test_Transform_o, "rotation", corto_member_o));
+    if (!Test_Transform_rotation_o) {
+        corto_error("Test_load: failed to declare 'Test_Transform_rotation_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
     Test_WHAT_o = corto_function(corto_declareChild(Test_o, "WHAT()", corto_function_o));
     if (!Test_WHAT_o) {
         corto_error("Test_load: failed to declare 'Test_WHAT_o' (%s)", corto_lasterr());
@@ -448,6 +490,56 @@ int Test_load(void) {
 
     if (corto_type(Test_Point4D_o)->size != sizeof(Test_Point4D)) {
         corto_error("Test_load: calculated size '%d' of type 'Test_Point4D_o' doesn't match C-type size '%d'", corto_type(Test_Point4D_o)->size, sizeof(Test_Point4D));
+    }
+
+    if (!corto_checkState(Test_Transform_position_o, CORTO_VALID)) {
+        Test_Transform_position_o->type = corto_type((corto_claim(Test_Point3D_o), Test_Point3D_o));
+        Test_Transform_position_o->modifiers = 0x0;
+        Test_Transform_position_o->unit = NULL;
+        Test_Transform_position_o->state = 0x5;
+        Test_Transform_position_o->stateCondExpr = NULL;
+        Test_Transform_position_o->weak = FALSE;
+        Test_Transform_position_o->id = 0;
+        if (corto_define(Test_Transform_position_o)) {
+            corto_error("Test_load: failed to define 'Test_Transform_position_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (!corto_checkState(Test_Transform_rotation_o, CORTO_VALID)) {
+        Test_Transform_rotation_o->type = corto_type((corto_claim(Test_Point3D_o), Test_Point3D_o));
+        Test_Transform_rotation_o->modifiers = 0x0;
+        Test_Transform_rotation_o->unit = NULL;
+        Test_Transform_rotation_o->state = 0x5;
+        Test_Transform_rotation_o->stateCondExpr = NULL;
+        Test_Transform_rotation_o->weak = FALSE;
+        Test_Transform_rotation_o->id = 1;
+        if (corto_define(Test_Transform_rotation_o)) {
+            corto_error("Test_load: failed to define 'Test_Transform_rotation_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (!corto_checkState(Test_Transform_o, CORTO_VALID)) {
+        ((corto_type)Test_Transform_o)->kind = CORTO_COMPOSITE;
+        ((corto_type)Test_Transform_o)->reference = FALSE;
+        ((corto_type)Test_Transform_o)->attr = 0x10;
+        ((corto_type)Test_Transform_o)->options.parentType = NULL;
+        ((corto_type)Test_Transform_o)->options.parentState = 0x5;
+        ((corto_type)Test_Transform_o)->options.defaultType = NULL;
+        ((corto_type)Test_Transform_o)->options.defaultProcedureType = NULL;
+        ((corto_interface)Test_Transform_o)->base = NULL;
+        Test_Transform_o->baseAccess = 0x0;
+        Test_Transform_o->keys.length = 0;
+        Test_Transform_o->keys.buffer = NULL;
+        if (corto_define(Test_Transform_o)) {
+            corto_error("Test_load: failed to define 'Test_Transform_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (corto_type(Test_Transform_o)->size != sizeof(Test_Transform)) {
+        corto_error("Test_load: calculated size '%d' of type 'Test_Transform_o' doesn't match C-type size '%d'", corto_type(Test_Transform_o)->size, sizeof(Test_Transform));
     }
 
     Test_WHATKL_o = corto_function(corto_declareChild(Test_o, "WHATKL(/Test/Point b)", corto_function_o));

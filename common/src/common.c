@@ -376,7 +376,6 @@ corto_int16 cpp_isVoid(corto_type t) {
 //         }
 //     }
 // }
-
 // corto_int16 cpp_assignCppTypeFromCType(
 //     g_generator g,
 //     g_file file, 
@@ -391,15 +390,21 @@ corto_int16 cpp_isVoid(corto_type t) {
 char* cpp_typeCastCppTypeToCType(
     g_generator g,
     corto_type t,
+    cpp_modifierMask modifiers,
     corto_string rvalue,
     corto_string buffer)
 {
     if (t->kind == CORTO_PRIMITIVE) {
         corto_primitive p = corto_primitive(t);
         if (p->kind == CORTO_TEXT) {
-            sprintf(buffer, "corto_strdup(%s.c_str())", rvalue);
+            if (modifiers & Cpp_NoCopy) {
+                sprintf(buffer, "%s.c_str()", rvalue);
+            } else {
+                sprintf(buffer, "corto_strdup(%s.c_str())", rvalue);
+            }
         } else {
-            sprintf(buffer, rvalue);
+            corto_bool ptr = modifiers & Cpp_Ptr;
+            sprintf(buffer, "%s%s", ptr ? "&" : "", rvalue);
         }
     } else if (cpp_isVoid(t)) {
 
@@ -415,7 +420,11 @@ char* cpp_typeCastCppTypeToCType(
         if (t->reference) {
             sprintf(buffer, "(%s)(%s.ptr())", cClassId, rvalue);
         } else {
-            sprintf(buffer, "*(%s)(%s.ptr())", cClassId, rvalue);
+            if (modifiers && Cpp_Ptr) {
+                sprintf(buffer, "(%s)(%s.ptr())", cClassId, rvalue);
+            } else {
+                sprintf(buffer, "*(%s)(%s.ptr())", cClassId, rvalue);
+            }
         }
     }
 
@@ -425,10 +434,11 @@ char* cpp_typeCastCppTypeToCType(
 char* cpp_typeCastCTypeToCppType(
     g_generator g,
     corto_type t,
-    corto_bool ptr,
+    cpp_modifierMask modifiers,
     corto_string rvalue,
     corto_string buffer)
 {
+    corto_bool ptr = modifiers & Cpp_Ptr;
     if (t->kind == CORTO_PRIMITIVE) {
         corto_primitive p = corto_primitive(t);
         if (p->kind == CORTO_TEXT) {
@@ -550,6 +560,84 @@ corto_int16 cpp_visitProcedure(
     g_fileDedent(source);
 
     g_fileWrite(source, "}\n\n");
+
+    return 0;
+}
+
+corto_int16 cpp_apiAssign(
+    g_generator g,
+    g_file f,
+    corto_type t,
+    cpp_modifierMask modifiers,
+    corto_string lvalue,
+    corto_string rvalue)
+{
+    if (corto_typeof(t) == (corto_type)corto_target_o) {
+        corto_id _this;
+        cpp_modifierMask owned = modifiers & Cpp_Owned;
+        if (owned) {
+            sprintf(_this, "%s->actual", lvalue);
+        } else {
+            sprintf(_this, "%s->target", lvalue);
+        }
+        cpp_apiAssign(g, f, corto_target(t)->type, owned, _this, rvalue);
+    } else if (modifiers & Cpp_Optional) {
+        // TODO: set optional variable 
+        // corto_id varId;
+        // g_fileWrite(f, "if (%s) {\n", lvalue);
+        // g_fileIndent(f);
+        // g_fileWrite(f, "corto_ptr_deinit(%s, %s);\n", lvalue, c_varId(g, t, varId));
+        // g_fileWrite(f, "corto_dealloc(%s);\n", lvalue);
+        // g_fileDedent(f);
+        // g_fileWrite(f, "}\n");
+        // g_fileWrite(f, "%s%s = %s;\n",
+        //     (!c_typeRequiresPtr(t) && ptr) ? "*" : "",
+        //     lvalue, rvalue);
+    } else {
+        corto_bool ptr = modifiers & Cpp_Ptr;
+        if (t->reference) {
+            g_fileWrite(f, "corto_ptr_setref(%s%s, %s);\n", ptr ? "" : "&", lvalue, rvalue);
+        } else if (t->kind == CORTO_PRIMITIVE) {
+            if (corto_primitive(t)->kind == CORTO_TEXT) {
+                g_fileWrite(f, "corto_ptr_setstr(%s%s, %s);\n", ptr ? "" : "&", lvalue, rvalue);
+            } else {
+                g_fileWrite(f, "%s%s = %s;\n", ptr ? "*" : "", lvalue, rvalue);
+            }
+        } else {
+            corto_id id, postfix;
+            corto_bool noAmpersand =
+                c_typeRequiresPtr(t) ||
+                ((t->kind == CORTO_COLLECTION) &&
+                  (corto_collection(t)->kind == CORTO_ARRAY)
+                );
+
+            c_specifierId(g, t, id, NULL, postfix);
+            if (noAmpersand) {
+                g_fileWrite(f, "if (%s) {\n", rvalue);
+                g_fileIndent(f);
+            }
+            if ((t->kind == CORTO_COLLECTION) &&
+                (corto_collection(t)->kind != CORTO_SEQUENCE))
+            {
+                g_fileWrite(f, "if (%s) {\n", rvalue);
+                g_fileIndent(f);
+            }
+            g_fileWrite(f, "corto_ptr_copy(&%s, %s_o, %s%s);\n",
+                lvalue, id,
+                noAmpersand ? "" : "&",
+                rvalue);
+            if ((t->kind == CORTO_COLLECTION) &&
+                (corto_collection(t)->kind != CORTO_SEQUENCE))
+            {
+                g_fileDedent(f);
+                g_fileWrite(f, "}\n");
+            }
+            if (noAmpersand) {
+                g_fileDedent(f);
+                g_fileWrite(f, "}\n");
+            }
+        }
+    }
 
     return 0;
 }

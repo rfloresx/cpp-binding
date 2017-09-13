@@ -55,6 +55,19 @@ struct Test_Point4D {
 typedef Test_Point4D Point4D;
 #endif
 
+/*  /Test/Transform */
+typedef struct Test_Transform Test_Transform;
+
+struct Test_Transform {
+    Test_Point3D position;
+    Test_Point3D rotation;
+    corto_string name;
+};
+
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+typedef Test_Transform Transform;
+#endif
+
 #ifdef __cplusplus
 }
 #endif

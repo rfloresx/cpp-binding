@@ -28,7 +28,6 @@ void Test::WHAT(int32_t v) {
 }
 */
 
-
 static int cpp_walkTypes(corto_object o, void* userData) {
     cpp_mainWalk_t *data = userData;
 
@@ -73,6 +72,7 @@ static int cpp_processInterface(g_generator g) {
     walkData.header = cpp_headerOpen(g, g_getCurrent(g), "hpp");
     walkData.source = cpp_sourceOpen(g, g_getCurrent(g));
 
+    g_fileWrite(walkData.header, "#include <corto/cpp/cpp.hpp>\n");
     g_fileWrite(walkData.header, "#include <%s>\n\n", c_mainheader(g, mainheader));
     
     if (!g_walkRecursive(g, cpp_walkTypes, &walkData)) {

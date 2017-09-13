@@ -57,6 +57,22 @@ TEST_EXPORT extern corto_member Test_Point4D_w_o;
 #if !defined(__cplusplus) && defined(BUILDING_TEST)
 #define Point4D_w_o Test_Point4D_w_o
 #endif
+TEST_EXPORT extern corto_struct Test_Transform_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define Transform_o Test_Transform_o
+#endif
+TEST_EXPORT extern corto_member Test_Transform_name_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define Transform_name_o Test_Transform_name_o
+#endif
+TEST_EXPORT extern corto_member Test_Transform_position_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define Transform_position_o Test_Transform_position_o
+#endif
+TEST_EXPORT extern corto_member Test_Transform_rotation_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define Transform_rotation_o Test_Transform_rotation_o
+#endif
 TEST_EXPORT extern corto_function Test_WHAT_o;
 #if !defined(__cplusplus) && defined(BUILDING_TEST)
 #define WHAT_o Test_WHAT_o

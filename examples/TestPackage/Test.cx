@@ -17,6 +17,10 @@ struct Point4D: Point3D::
   w: int32
   void add(Point4D p)
 
+struct Transform::
+  position, rotation : Point3D
+  name : string
+  
 
 void BOOO(Point p)
 Point WHATKL(Point b)

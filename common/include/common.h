@@ -21,6 +21,14 @@ cpp_refKind::
     Cpp_ByVal if Class -> C{Name}Ref; if CType {c_type}; else {cpp_context}
     Cpp_ByRef if Class -> C{Name}Val; if CType {c_type || c_type*}; else {cpp_context}
 */
+enum cpp_modifier {
+    Cpp_Owned = 0x01,
+    Cpp_Ptr = 0x02,
+    Cpp_Optional = 0x04,
+    Cpp_NoCopy = 0x08
+};
+typedef int32_t cpp_modifierMask;
+
 typedef enum cpp_idKind {
     Cpp_Id,
     Cpp_FullId,
@@ -63,12 +71,12 @@ char *cpp_cprefix(void);
 
 corto_int16 cpp_isVoid(corto_type t);
 
-char* cpp_typeCastCppTypeToCType(g_generator g, corto_type t, corto_string rvalue, corto_string buffer);
-char* cpp_typeCastCTypeToCppType(g_generator g, corto_type t, corto_bool ptr, corto_string rvalue, corto_string buffer);
+char* cpp_typeCastCppTypeToCType(g_generator g, corto_type t, cpp_modifierMask modifiers, corto_string rvalue, corto_string buffer);
+char* cpp_typeCastCTypeToCppType(g_generator g, corto_type t, cpp_modifierMask modifiers, corto_string rvalue, corto_string buffer);
 
 corto_int16 cpp_walkProcedureParam(g_generator g, g_file file, corto_function f, corto_bool c);
 corto_int16 cpp_visitProcedure(g_generator g, g_file header, g_file source, corto_function f, corto_bool method);
-
+corto_int16 cpp_apiAssign(g_generator g, g_file f, corto_type t, cpp_modifierMask modifiers, corto_string lvalue, corto_string rvalue);
 
 // char* cpp_typeIdFromStr(g_generator g, char *str, cpp_context context, corto_id buffer);
 // char* cpp_varId(g_generator g, corto_object o, corto_id buffer);
