@@ -6,11 +6,16 @@ corto_bool cpp_classToUpper = FALSE;
 static char* cpp_objectIdIntern(
     g_generator g, 
     corto_object o, 
-    cpp_context context, 
-    cpp_refKind refKind, 
     cpp_idKind idKind, 
+    cpp_language language, 
+    cpp_modifierMask modifiers, 
     corto_id buffer)
 {
+    if (o == NULL || o == root_o)  {
+        buffer[0] = '\0';
+        return buffer;
+    }
+
     corto_id typeName;
     typeName[0] = '\0';
     if (corto_instanceof(corto_function_o, o)) {
@@ -20,9 +25,12 @@ static char* cpp_objectIdIntern(
         corto_type t = corto_type(o);
         if (t->kind == CORTO_PRIMITIVE) {
             corto_primitive p = corto_primitive(t);
-            if (p->kind == CORTO_TEXT && context != Cpp_CType) {
-                // use std::string for CORTO_TEXT and does not ask for CType
+            if (p->kind == CORTO_TEXT && language == Cpp_Cpp) {
                 strcpy(buffer, "::std::string");
+            } else if (p->kind == CORTO_ENUM || p->kind == CORTO_BITMASK) {
+                corto_id cppName;
+                cpp_idof(t, cppName);
+                sprintf(typeName, "%s::%s", cpp_cprefix(), cppName);
             } else {
                 c_primitiveId(g, p, buffer);
             }
@@ -33,31 +41,27 @@ static char* cpp_objectIdIntern(
         } else if (t->kind == CORTO_ITERATOR) {
             strcpy(buffer, "void*"); // TODO:
         } else {
-            switch (context) {
-                case Cpp_Class: {
-                    if (refKind == Cpp_ById) {
-                        sprintf(typeName, "C%s", corto_idof(t));
-                    } else if (refKind == Cpp_ByVal) {
-                        sprintf(typeName, "C%sVal", corto_idof(t));
-                    } else if (refKind == Cpp_ByRef) {
-                        sprintf(typeName, "C%sRef", corto_idof(t));
-                    }
-                    break;
+            corto_id cppName;
+            cpp_idof(t, cppName);
+
+            if (language == Cpp_Cpp) {
+                if (modifiers & Cpp_Class) {
+                    sprintf(typeName, "C%s", cppName);
+                } else if (modifiers & Cpp_Template) {
+                    sprintf(typeName, "T%s", cppName);
+                } else {
+                    sprintf(typeName, "%s", cppName);
                 }
-                case Cpp_Template: {
-                    sprintf(typeName, "T%s", corto_idof(t));
-                    break;
+
+                if (modifiers & Cpp_Val) {
+                    strcat(typeName, "Val");
+                } else if (modifiers & Cpp_Ref) {
+                    strcat(typeName, "Ref");
                 }
-                case Cpp_CType: {
-                    sprintf(typeName, "%s::%s", cpp_cprefix(), corto_idof(t));
-                    if ((refKind == Cpp_ByRef) && !t->reference) {
-                        strcat(typeName, "*");
-                    }
-                    break;
-                }
-                default: {
-                    strcpy(typeName, corto_idof(t));
-                    break;
+            } else {
+                sprintf(typeName, "%s::%s", cpp_cprefix(), cppName);
+                if ((modifiers & Cpp_Ref) && !t->reference) {
+                    strcat(typeName, "*");
                 }
             }
         }
@@ -66,24 +70,16 @@ static char* cpp_objectIdIntern(
     }
 
     if (typeName[0]) {
-        buffer[0] = '\0';
-        corto_id scope;
-        switch(idKind) {
-            case Cpp_AbsoluteId: {
-                corto_path(scope, root_o, corto_parentof(o), "::");
-                if (strcmp(scope, ".")) {
-                    sprintf(buffer, "%s::", scope);
-                }
-                break;
+        corto_object p = corto_parentof(o);
+        if ( p != root_o && ((idKind == Cpp_AbsoluteId) || 
+            (idKind == Cpp_FullId && p != g_getCurrent(g))))
+        {
+            cpp_objectIdIntern(g, corto_parentof(o), idKind, language, modifiers & ~(Cpp_Val | Cpp_Ref), buffer);
+            if (buffer[0] != '\0') {
+                strcat(buffer, "::");
             }
-            case Cpp_FullId: {
-                corto_path(scope, g_getCurrent(g), corto_parentof(o), "::");
-                if (strcmp(scope, ".") && strcmp(scope, "..")) {
-                    sprintf(buffer, "%s::", scope);
-                }
-                break;
-            }
-            default:{}
+        } else  {
+            buffer[0] = '\0';
         }
         strcat(buffer, typeName);
     }
@@ -91,19 +87,41 @@ static char* cpp_objectIdIntern(
     return buffer;
 }
 
-char* cpp_objectId(g_generator g, corto_object o, cpp_context c, cpp_refKind r, corto_id b)
-{
-    return cpp_objectIdIntern(g, o, c, r, Cpp_Id, b);
+
+char* cpp_idof(corto_object obj, corto_id buffer) {
+    corto_string id = corto_idof(obj);
+    corto_bool uppercase = TRUE;
+
+    char* from = id;
+    char* to = buffer;
+    while (*from) {
+        if (*from == '_') {
+            uppercase = TRUE;
+        } else {
+            if (uppercase) {
+                *to = toupper(*from);
+                uppercase = FALSE;
+            } else {
+                *to = *from;
+            }
+            to++;
+        }
+        from++;
+    }
+    *to = '\0';
+    return buffer;
 }
 
-char* cpp_objectFullId(g_generator g, corto_object o, cpp_context c, cpp_refKind r, corto_id b)
-{
-    return cpp_objectIdIntern(g, o, c, r, Cpp_FullId, b);
+char* cpp_objectId(g_generator g, corto_object o, cpp_language l, cpp_modifierMask m, corto_id b) {
+    return cpp_objectIdIntern(g, o, Cpp_Id, l, m, b);
 }
 
-char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_context c, cpp_refKind r, corto_id b)
-{
-    return cpp_objectIdIntern(g, o, c, r, Cpp_AbsoluteId, b);
+char* cpp_objectFullId(g_generator g, corto_object o, cpp_language l, cpp_modifierMask m, corto_id b) {
+    return cpp_objectIdIntern(g, o, Cpp_FullId, l, m, b);
+}
+
+char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_language l, cpp_modifierMask m, corto_id b) {
+    return cpp_objectIdIntern(g, o, Cpp_AbsoluteId, l, m, b);
 }
 
 g_file cpp_headerOpen(g_generator g, corto_object o, corto_id ext) {
@@ -260,7 +278,7 @@ corto_bool cpp_nativeType(corto_object o) {
 
 void cpp_useNamespace(g_generator g, g_file file, corto_object to) {
     corto_id scope;
-    cpp_objectAbsoluteId(g, to, Cpp_Type, Cpp_ById, scope);
+    cpp_objectAbsoluteId(g, to, Cpp_Cpp, Cpp_Class, scope);
     g_fileWrite(file, "using namespace %s;\n", scope);
 }
 
@@ -415,12 +433,12 @@ char* cpp_typeCastCppTypeToCType(
     } else {
         // 
         corto_id cClassId;
-        cpp_objectFullId(g, t, Cpp_CType, Cpp_ByRef, cClassId);
+        cpp_objectFullId(g, t, Cpp_C, Cpp_Ref, cClassId);
     
         if (t->reference) {
             sprintf(buffer, "(%s)(%s.ptr())", cClassId, rvalue);
         } else {
-            if (modifiers && Cpp_Ptr) {
+            if (modifiers & Cpp_Ptr) {
                 sprintf(buffer, "(%s)(%s.ptr())", cClassId, rvalue);
             } else {
                 sprintf(buffer, "*(%s)(%s.ptr())", cClassId, rvalue);
@@ -455,8 +473,8 @@ char* cpp_typeCastCTypeToCppType(
     } else {
         // 
         corto_id classId, cTypeId;
-        cpp_objectFullId(g, t, Cpp_Class, Cpp_ById, classId);
-        cpp_objectFullId(g, t, Cpp_CType, Cpp_ById, cTypeId);
+        cpp_objectFullId(g, t, Cpp_Cpp, Cpp_Class, classId);
+        cpp_objectFullId(g, t, Cpp_C, Cpp_Val, cTypeId);
         
         if (t->reference) {
             sprintf(buffer, "%s(%s)", classId, rvalue);
@@ -502,7 +520,7 @@ corto_int16 cpp_walkProcedureParam(
         if (c) {
             c_typeret(g, p->type, C_ByReference, paramTypeId);
         } else {
-            cpp_objectFullId(g, p->type, Cpp_Class, Cpp_ById, paramTypeId);
+            cpp_objectFullId(g, p->type, Cpp_Cpp, Cpp_Class, paramTypeId);
         }
 
         g_fileWrite(file, "%s %s", paramTypeId, p->name);
@@ -524,11 +542,11 @@ corto_int16 cpp_visitProcedure(
 {
     corto_id resultId, methodId, methodFullId;
 
-    cpp_objectFullId(g, f->returnType, Cpp_Class, Cpp_ById, resultId);
+    cpp_objectFullId(g, f->returnType, Cpp_Cpp, Cpp_Class, resultId);
+    cpp_objectFullId(g, f, Cpp_Cpp, Cpp_Class, methodFullId);
     corto_signatureName(corto_idof(f), methodId);
-    cpp_objectFullId(g, corto_parentof(f), Cpp_Class, Cpp_ById, methodFullId);
-    strcat(methodFullId, "::");
-    strcat(methodFullId, methodId);
+    // strcat(methodFullId, "::");
+    // strcat(methodFullId, methodId);
 
     if (method && !c_procedureHasThis(f)) {
         g_fileWrite(header, "static ");

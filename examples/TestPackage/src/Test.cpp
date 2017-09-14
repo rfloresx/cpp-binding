@@ -3,19 +3,19 @@
 
 using namespace Test;
 
-void Test::BOOO(CPoint p)
+void BOOO(CPoint p)
 {
     /* Insert Implementation*/
 
 }
 
-corto::vstore::Cmount Test::WHAT()
+corto::vstore::CMount WHAT()
 {
     /* Insert Implementation*/
 
 }
 
-CPoint Test::WHATKL(CPoint b)
+CPoint WHATKL(CPoint b)
 {
     /* Insert Implementation*/
 

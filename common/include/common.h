@@ -35,22 +35,22 @@ typedef enum cpp_idKind {
     Cpp_AbsoluteId
 } cpp_idKind;
 
-typedef enum cpp_context {
-    Cpp_Class,
-    Cpp_Template,
-    Cpp_Type,
-    Cpp_CType
-} cpp_context;
+typedef enum cpp_language {
+    Cpp_C,
+    Cpp_Cpp
+} cpp_language;
 
-typedef enum cpp_refKind {
-    Cpp_ById,
-    Cpp_ByVal,
-    Cpp_ByRef
-} cpp_refKind;
+enum cpp_idModifier {
+    Cpp_Class = 0x10,
+    Cpp_Template = 0x20,
+    Cpp_Val = 0x40,
+    Cpp_Ref = 0x80
+};
 
-char* cpp_objectId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
-char* cpp_objectFullId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
-char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_context context, cpp_refKind refKind, corto_id buffer);
+char* cpp_idof(corto_object obj, corto_id buffer);
+char* cpp_objectId(g_generator g, corto_object o, cpp_language l, cpp_modifierMask m, corto_id b);
+char* cpp_objectFullId(g_generator g, corto_object o, cpp_language l, cpp_modifierMask m, corto_id b);
+char* cpp_objectAbsoluteId(g_generator g, corto_object o, cpp_language l, cpp_modifierMask m, corto_id b);
 
 g_file cpp_headerOpen(g_generator g, corto_object o, corto_id ext);
 void cpp_headerClose(g_generator g, g_file file);

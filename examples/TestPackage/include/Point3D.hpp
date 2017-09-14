@@ -35,7 +35,7 @@ public:
     CPoint3D(CPoint3D&& other);
     CPoint3D(types::Point3D* ref);
     CPoint3D(types::Point3D val);
-    CPoint3D(types::Point3D* ref, ::corto::Type type);
+    CPoint3D(types::Point3D* ref, ::corto::CType type);
     
     ~CPoint3D();
     

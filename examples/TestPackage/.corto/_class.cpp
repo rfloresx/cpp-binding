@@ -66,8 +66,8 @@ Test::CPoint() : Test::CPoint::Base() {}
 Test::CPoint(const Test::CPoint& other) : Test::CPoint::Base(other) {}
 Test::CPoint(Test::CPoint&& other) : Test::CPoint::Base(std::move(other)) {}
 Test::CPoint(Test::types::Point* ref) : Test::CPoint::Base(ref) {}
-Test::CPoint(Test::types::Point val) : Test::types::Point::Base(&val, Test::CPoint_o) {}
-Test::CPoint(Test::types::Point* ref, ::corto::Type type) : Test::CPoint::Base(ref, type) {}
+Test::CPoint(Test::types::Point val) : Test::CPoint::Base(&val, Test::types::Point_o) {}
+Test::CPoint(Test::types::Point* ref, ::corto::CType type) : Test::CPoint::Base(ref, type) {}
 Test::~CPoint(){}
 
 // Implementation for CPoint3D
@@ -106,8 +106,8 @@ Test::CPoint3D() : Test::CPoint3D::Base() {}
 Test::CPoint3D(const Test::CPoint3D& other) : Test::CPoint3D::Base(other) {}
 Test::CPoint3D(Test::CPoint3D&& other) : Test::CPoint3D::Base(std::move(other)) {}
 Test::CPoint3D(Test::types::Point3D* ref) : Test::CPoint3D::Base(ref) {}
-Test::CPoint3D(Test::types::Point3D val) : Test::types::Point3D::Base(&val, Test::CPoint3D_o) {}
-Test::CPoint3D(Test::types::Point3D* ref, ::corto::Type type) : Test::CPoint3D::Base(ref, type) {}
+Test::CPoint3D(Test::types::Point3D val) : Test::CPoint3D::Base(&val, Test::types::Point3D_o) {}
+Test::CPoint3D(Test::types::Point3D* ref, ::corto::CType type) : Test::CPoint3D::Base(ref, type) {}
 Test::~CPoint3D(){}
 
 // Implementation for CPoint4D
@@ -146,8 +146,8 @@ Test::CPoint4D() : Test::CPoint4D::Base() {}
 Test::CPoint4D(const Test::CPoint4D& other) : Test::CPoint4D::Base(other) {}
 Test::CPoint4D(Test::CPoint4D&& other) : Test::CPoint4D::Base(std::move(other)) {}
 Test::CPoint4D(Test::types::Point4D* ref) : Test::CPoint4D::Base(ref) {}
-Test::CPoint4D(Test::types::Point4D val) : Test::types::Point4D::Base(&val, Test::CPoint4D_o) {}
-Test::CPoint4D(Test::types::Point4D* ref, ::corto::Type type) : Test::CPoint4D::Base(ref, type) {}
+Test::CPoint4D(Test::types::Point4D val) : Test::CPoint4D::Base(&val, Test::types::Point4D_o) {}
+Test::CPoint4D(Test::types::Point4D* ref, ::corto::CType type) : Test::CPoint4D::Base(ref, type) {}
 Test::~CPoint4D(){}
 
 // Implementation for CTransform
@@ -181,6 +181,14 @@ void Test::CTransform::name(::std::string value)
 {
     corto_ptr_setstr(&((Test::types::Transform*)this->ptr())->name, value.c_str());
 }
+Test::types::TestEnum Test::CTransform::test_enum() const
+{
+    return Test::types::TestEnum{((Test::types::Transform*)this->ptr())->test_enum};
+}
+void Test::CTransform::test_enum(Test::types::TestEnum value)
+{
+    ((Test::types::Transform*)this->ptr())->test_enum = value;
+}
 
 
 Test::CTransform& Test::CTransform::operator=(const Test::CTransform& other)
@@ -200,8 +208,8 @@ Test::CTransform() : Test::CTransform::Base() {}
 Test::CTransform(const Test::CTransform& other) : Test::CTransform::Base(other) {}
 Test::CTransform(Test::CTransform&& other) : Test::CTransform::Base(std::move(other)) {}
 Test::CTransform(Test::types::Transform* ref) : Test::CTransform::Base(ref) {}
-Test::CTransform(Test::types::Transform val) : Test::types::Transform::Base(&val, Test::CTransform_o) {}
-Test::CTransform(Test::types::Transform* ref, ::corto::Type type) : Test::CTransform::Base(ref, type) {}
+Test::CTransform(Test::types::Transform val) : Test::CTransform::Base(&val, Test::types::Transform_o) {}
+Test::CTransform(Test::types::Transform* ref, ::corto::CType type) : Test::CTransform::Base(ref, type) {}
 Test::~CTransform(){}
 
 

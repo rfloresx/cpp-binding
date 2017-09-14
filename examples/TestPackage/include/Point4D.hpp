@@ -35,7 +35,7 @@ public:
     CPoint4D(CPoint4D&& other);
     CPoint4D(types::Point4D* ref);
     CPoint4D(types::Point4D val);
-    CPoint4D(types::Point4D* ref, ::corto::Type type);
+    CPoint4D(types::Point4D* ref, ::corto::CType type);
     
     ~CPoint4D();
     

@@ -57,6 +57,38 @@ TEST_EXPORT extern corto_member Test_Point4D_w_o;
 #if !defined(__cplusplus) && defined(BUILDING_TEST)
 #define Point4D_w_o Test_Point4D_w_o
 #endif
+TEST_EXPORT extern corto_enum Test_TestEnum_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestEnum_o Test_TestEnum_o
+#endif
+TEST_EXPORT extern int32_t* Test_TestEnum_E_A_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestEnum_E_A_o Test_TestEnum_E_A_o
+#endif
+TEST_EXPORT extern int32_t* Test_TestEnum_E_B_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestEnum_E_B_o Test_TestEnum_E_B_o
+#endif
+TEST_EXPORT extern int32_t* Test_TestEnum_E_C_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestEnum_E_C_o Test_TestEnum_E_C_o
+#endif
+TEST_EXPORT extern corto_enum Test_TestMask_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestMask_o Test_TestMask_o
+#endif
+TEST_EXPORT extern int32_t* Test_TestMask_M_A_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestMask_M_A_o Test_TestMask_M_A_o
+#endif
+TEST_EXPORT extern int32_t* Test_TestMask_M_B_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestMask_M_B_o Test_TestMask_M_B_o
+#endif
+TEST_EXPORT extern int32_t* Test_TestMask_M_C_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define TestMask_M_C_o Test_TestMask_M_C_o
+#endif
 TEST_EXPORT extern corto_struct Test_Transform_o;
 #if !defined(__cplusplus) && defined(BUILDING_TEST)
 #define Transform_o Test_Transform_o
@@ -72,6 +104,10 @@ TEST_EXPORT extern corto_member Test_Transform_position_o;
 TEST_EXPORT extern corto_member Test_Transform_rotation_o;
 #if !defined(__cplusplus) && defined(BUILDING_TEST)
 #define Transform_rotation_o Test_Transform_rotation_o
+#endif
+TEST_EXPORT extern corto_member Test_Transform_test_enum_o;
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+#define Transform_test_enum_o Test_Transform_test_enum_o
 #endif
 TEST_EXPORT extern corto_function Test_WHAT_o;
 #if !defined(__cplusplus) && defined(BUILDING_TEST)

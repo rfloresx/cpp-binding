@@ -27,6 +27,19 @@ void Test::WHAT(int32_t v) {
     // TODO:
 }
 */
+static int cpp_walkEnums(corto_object o, void* userData) {
+    cpp_mainWalk_t *data = userData;
+    if (corto_instanceof(corto_primitive_o, o)) {
+        corto_primitive p = corto_primitive(o);
+        if (p->kind == CORTO_ENUM || p->kind == CORTO_BITMASK) {
+            corto_id typeId, cTypeId;
+            cpp_idof(o, typeId);
+            c_typeId(data->g, o, cTypeId);
+            g_fileWrite(data->header, "typedef %s %s;\n", cTypeId, typeId);
+        }
+    }
+    return 1;
+}
 
 static int cpp_walkTypes(corto_object o, void* userData) {
     cpp_mainWalk_t *data = userData;
@@ -51,7 +64,7 @@ static int cpp_walkFunctions(corto_object o, void* userData) {
 static int cpp_genMain(g_generator g, g_file file) {
     corto_id mainId;
 
-    cpp_objectId(g, g_getCurrent(g), Cpp_Type, Cpp_ById, mainId); 
+    cpp_objectId(g, g_getCurrent(g), Cpp_Cpp, 0, mainId); 
 
     g_fileWrite(file, "int %sMain(int argc, char* argv[])\n", mainId);
     g_fileWrite(file, "{\n");
@@ -75,6 +88,17 @@ static int cpp_processInterface(g_generator g) {
     g_fileWrite(walkData.header, "#include <corto/cpp/cpp.hpp>\n");
     g_fileWrite(walkData.header, "#include <%s>\n\n", c_mainheader(g, mainheader));
     
+    cpp_openScope(walkData.header, g_getCurrent(g));
+    g_fileWrite(walkData.header, "namespace %s {\n", cpp_cprefix());
+    g_fileIndent(walkData.header);
+    if (!g_walkRecursive(g, cpp_walkEnums, &walkData)) {
+        goto error;
+    }
+    g_fileDedent(walkData.header);
+    g_fileWrite(walkData.header, "}");
+    cpp_closeScope(walkData.header);
+    g_fileWrite(walkData.header, "\n");
+
     if (!g_walkRecursive(g, cpp_walkTypes, &walkData)) {
         goto error;
     }
@@ -120,6 +144,10 @@ error:
 }
 
 static int cpp_createCHeader(g_generator g) {
+    g_parse(g, corto_o, FALSE, FALSE, "");
+    g_parse(g, corto_lang_o, FALSE, FALSE, "corto");
+    g_parse(g, corto_vstore_o, FALSE, FALSE, "corto");
+
     g_file header = cpp_headerOpen(g, g_getCurrent(g), "h");
 
     c_includeFrom(g, header, corto_o, "corto.h");

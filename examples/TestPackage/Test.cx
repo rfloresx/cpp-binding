@@ -1,5 +1,14 @@
 #package /Test
 
+enum TestEnum::
+  E_A,
+  E_B,
+  E_C
+
+enum TestMask::
+  M_A : 1
+  M_B : 2
+  M_C : 4
 
 struct Point::
   x, y: int32
@@ -20,7 +29,7 @@ struct Point4D: Point3D::
 struct Transform::
   position, rotation : Point3D
   name : string
-  
+  test_enum : TestEnum
 
 void BOOO(Point p)
 Point WHATKL(Point b)

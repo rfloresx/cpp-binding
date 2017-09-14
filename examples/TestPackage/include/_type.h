@@ -55,6 +55,28 @@ struct Test_Point4D {
 typedef Test_Point4D Point4D;
 #endif
 
+/* /Test/TestEnum */
+typedef enum Test_TestEnum {
+    Test_E_A = 0,
+    Test_E_B = 1,
+    Test_E_C = 2
+} Test_TestEnum;
+
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+typedef Test_TestEnum TestEnum;
+#endif
+
+/* /Test/TestMask */
+typedef enum Test_TestMask {
+    Test_M_A = 1,
+    Test_M_B = 2,
+    Test_M_C = 4
+} Test_TestMask;
+
+#if !defined(__cplusplus) && defined(BUILDING_TEST)
+typedef Test_TestMask TestMask;
+#endif
+
 /*  /Test/Transform */
 typedef struct Test_Transform Test_Transform;
 
@@ -62,6 +84,7 @@ struct Test_Transform {
     Test_Point3D position;
     Test_Point3D rotation;
     corto_string name;
+    Test_TestEnum test_enum;
 };
 
 #if !defined(__cplusplus) && defined(BUILDING_TEST)

@@ -41,7 +41,7 @@ public:
     CPoint(CPoint&& other);
     CPoint(types::Point* ref);
     CPoint(types::Point val);
-    CPoint(types::Point* ref, ::corto::Type type);
+    CPoint(types::Point* ref, ::corto::CType type);
     
     ~CPoint();
     

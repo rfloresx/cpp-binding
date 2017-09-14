@@ -33,8 +33,8 @@ static corto_int16 cpp_walkMetadata(corto_interface type, cpp_classWalk_t *data)
     c_varId(data->g, type, objectId);
     c_typeId(data->g, type, cTypeId);
 
-    cpp_objectId(data->g, type, Cpp_Type, Cpp_ById, typeId);
-    cpp_objectAbsoluteId(data->g, type, Cpp_CType, Cpp_ById, fullId);
+    cpp_objectId(data->g, type, Cpp_Cpp, 0, typeId);
+    cpp_objectAbsoluteId(data->g, type, Cpp_C, 0, fullId);
 
     g_fileWrite(data->header, "namespace %s {\n", cpp_cprefix());
     g_fileIndent(data->header);
@@ -61,15 +61,15 @@ static corto_int16 cpp_visitMember(corto_walk_opt* s, corto_value *info, void *u
     //corto_id id, cId, classId, memberId;
     corto_id memberType, classId, memberId, cClassId;
 
-    cpp_objectFullId(data->g, t, Cpp_Class, Cpp_ById, memberType);
+    cpp_objectFullId(data->g, t, Cpp_Cpp, Cpp_Class, memberType);
     g_oid(data->g, m, memberId);
 
     g_fileWrite(data->header, "%s %s() const;\n", memberType, memberId);
     g_fileWrite(data->header, "void %s(%s value);\n", memberId, memberType);
 
-    cpp_objectAbsoluteId(data->g, t, Cpp_Class, Cpp_ById, memberType);
-    cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_Class, Cpp_ById, classId);
-    cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_CType, Cpp_ByRef, cClassId);
+    cpp_objectAbsoluteId(data->g, t, Cpp_Cpp, Cpp_Class, memberType);
+    cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_Cpp, Cpp_Class, classId);
+    cpp_objectAbsoluteId(data->g, corto_parentof(m), Cpp_C, Cpp_Ref, cClassId);
 
     g_fileWrite(data->hiddenImpl, "%s %s::%s() const\n", memberType, classId, memberId);
     g_fileWrite(data->hiddenImpl, "{\n");
@@ -128,7 +128,7 @@ static corto_int16 cpp_methodProxy(corto_function f, cpp_classWalk_t *data) {
     corto_signatureName(methodId, methodId);
 
     c_typeret(data->g, f->returnType, f->returnsReference, cReturnId);
-    cpp_objectAbsoluteId(data->g, f->returnType, Cpp_Class, Cpp_ById, cppReturnId);
+    cpp_objectAbsoluteId(data->g, f->returnType, Cpp_Cpp, Cpp_Class, cppReturnId);
 
     g_fileWrite(data->hiddenImpl, "extern \"C\" %s %s(", cReturnId, proxyId);
     
@@ -139,13 +139,13 @@ static corto_int16 cpp_methodProxy(corto_function f, cpp_classWalk_t *data) {
 
     /* Wrap C parameters in C++ types */
     if (hasThis) {
-        cpp_objectAbsoluteId(data->g, corto_parentof(f), Cpp_Class, Cpp_ById, cppType);
+        cpp_objectAbsoluteId(data->g, corto_parentof(f), Cpp_Cpp, Cpp_Class, cppType);
         g_fileWrite(data->hiddenImpl, "%s _instance(_this);\n", cppType);
     }
 
     for (i = 0; i < parametersLength; i++) {
         corto_parameter *p = &f->parameters.buffer[i];
-        cpp_objectAbsoluteId(data->g, p->type, Cpp_Class, Cpp_ById, cppType);
+        cpp_objectAbsoluteId(data->g, p->type, Cpp_Cpp, Cpp_Class, cppType);
         g_fileWrite(data->hiddenImpl, "%s _%s(%s);\n", cppType, p->name, p->name);
     }
 
@@ -156,7 +156,7 @@ static corto_int16 cpp_methodProxy(corto_function f, cpp_classWalk_t *data) {
     if (hasThis) {
         g_fileWrite(data->hiddenImpl, "_instance.");
     } else {
-        cpp_objectAbsoluteId(data->g, corto_parentof(f), Cpp_Class, Cpp_ById, cppType);
+        cpp_objectAbsoluteId(data->g, corto_parentof(f), Cpp_Cpp, Cpp_Class, cppType);
         g_fileWrite(data->hiddenImpl, "%s::", cppType);
     }
     
@@ -250,11 +250,11 @@ error:
 static corto_int16 cpp_classOperators(corto_interface type, cpp_classWalk_t *data) {
     corto_id classId, fullClassId, cType, fullCType;
     
-    cpp_objectId(data->g, type, Cpp_Class, Cpp_ById, classId);
-    cpp_objectAbsoluteId(data->g, type, Cpp_Class, Cpp_ById, fullClassId);
+    cpp_objectId(data->g, type, Cpp_Cpp, Cpp_Class, classId);
+    cpp_objectAbsoluteId(data->g, type, Cpp_Cpp, Cpp_Class, fullClassId);
 
-    cpp_objectId(data->g, type, Cpp_CType, Cpp_ByRef, cType);
-    cpp_objectAbsoluteId(data->g, type, Cpp_CType, Cpp_ByRef, fullCType);
+    cpp_objectId(data->g, type, Cpp_C, Cpp_Ref, cType);
+    cpp_objectAbsoluteId(data->g, type, Cpp_C, Cpp_Ref, fullCType);
 
     g_fileWrite(data->header, "%s& operator=(const %s& other);\n", classId, classId);
     g_fileWrite(data->hiddenImpl, "%s& %s::operator=(const %s& other)\n", fullClassId, fullClassId, fullClassId);
@@ -302,11 +302,11 @@ error:
 static corto_int16 cpp_classConstructs(corto_interface type, cpp_classWalk_t *data) {
     corto_id classId, fullClassId, cType, fullCType;
     
-    cpp_objectId(data->g, type, Cpp_Class, Cpp_ById, classId);
-    cpp_objectAbsoluteId(data->g, type, Cpp_Class, Cpp_ById, fullClassId);
+    cpp_objectId(data->g, type, Cpp_Cpp, Cpp_Class, classId);
+    cpp_objectAbsoluteId(data->g, type, Cpp_Cpp, Cpp_Class, fullClassId);
 
-    cpp_objectId(data->g, type, Cpp_CType, Cpp_ByRef, cType);
-    cpp_objectAbsoluteId(data->g, type, Cpp_CType, Cpp_ByRef, fullCType);
+    cpp_objectId(data->g, type, Cpp_C, Cpp_Ref, cType);
+    cpp_objectAbsoluteId(data->g, type, Cpp_C, Cpp_Ref, fullCType);
 
     g_fileWrite(data->header, "%s();\n", classId);
     g_fileWrite(data->hiddenImpl, "%s() : %s::Base() {}\n", fullClassId, fullClassId);
@@ -322,17 +322,17 @@ static corto_int16 cpp_classConstructs(corto_interface type, cpp_classWalk_t *da
     
     if (type->kind == CORTO_STRUCT) {
         corto_id ctype, fullctype;
-        cpp_objectId(data->g, type, Cpp_CType, Cpp_ByVal, ctype);
-        cpp_objectAbsoluteId(data->g, type, Cpp_CType, Cpp_ByVal, fullctype);
+        cpp_objectId(data->g, type, Cpp_C, Cpp_Val, ctype);
+        cpp_objectAbsoluteId(data->g, type, Cpp_C, Cpp_Val, fullctype);
 
         g_fileWrite(data->header, "%s(%s val);\n", classId, ctype);
-        g_fileWrite(data->hiddenImpl, "%s(%s val) : %s::Base(&val, %s_o) {}\n", fullClassId, fullctype, fullctype, fullClassId);
+        g_fileWrite(data->hiddenImpl, "%s(%s val) : %s::Base(&val, %s_o) {}\n", fullClassId, fullctype, fullClassId, fullctype);
     }
 
-    g_fileWrite(data->header, "%s(%s ref, ::corto::Type type);\n", classId, cType);
-    g_fileWrite(data->hiddenImpl, "%s(%s ref, ::corto::Type type) : %s::Base(ref, type) {}\n", fullClassId, fullCType, fullClassId);
+    g_fileWrite(data->header, "%s(%s ref, ::corto::CType type);\n", classId, cType);
+    g_fileWrite(data->hiddenImpl, "%s(%s ref, ::corto::CType type) : %s::Base(ref, type) {}\n", fullClassId, fullCType, fullClassId);
 
-    cpp_objectAbsoluteId(data->g, corto_parentof(type), Cpp_CType, Cpp_ByVal, fullClassId);
+    cpp_objectAbsoluteId(data->g, corto_parentof(type), Cpp_Cpp, Cpp_Class, fullClassId);
     g_fileWrite(data->header, "\n");
     g_fileWrite(data->header, "~%s();\n", classId);
     g_fileWrite(data->hiddenImpl, "%s::~%s(){}\n", fullClassId, classId);
@@ -343,15 +343,16 @@ static corto_int16 cpp_visitClass(corto_interface type, cpp_classWalk_t *data) {
     
     corto_id class, cType, baseClass, baseCType;
     corto_id mainheader;
-    cpp_objectId(data->g, type, Cpp_Class, Cpp_ById, class);
+    cpp_objectId(data->g, type, Cpp_Cpp, Cpp_Class, class);
     cpp_mainheader(data->g, mainheader);
     if (!type->base) {
         strcpy(baseClass, "::corto::Object");
         strcpy(baseCType, "corto_object");
     } else {
-        cpp_objectFullId(data->g, type->base, Cpp_Class, Cpp_ById, baseClass);
-        cpp_objectFullId(data->g, type->base, Cpp_CType, Cpp_ById, baseCType);
+        cpp_objectFullId(data->g, type->base, Cpp_Cpp, Cpp_Class, baseClass);
+        cpp_objectFullId(data->g, type->base, Cpp_C, 0, baseCType);
     }
+
     data->header = cpp_headerOpen(data->g, type, "hpp");
     if (!data->header) {
         goto error;
@@ -447,6 +448,10 @@ ERROR();
 }
 
 corto_int16 corto_genMain(g_generator g) {
+    // g_parse(g, corto_o, FALSE, FALSE, "");
+    // g_parse(g, corto_lang_o, FALSE, FALSE, "corto");
+    // g_parse(g, corto_vstore_o, FALSE, FALSE, "corto");
+    
     cpp_classWalk_t walkData = {g, NULL, NULL, NULL};
     
     cpp_hiddenImplOpen(&walkData);

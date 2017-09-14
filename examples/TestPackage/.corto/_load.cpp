@@ -81,10 +81,19 @@ corto_struct Test_Point3D_o;
 corto_member Test_Point3D_z_o;
 corto_struct Test_Point4D_o;
 corto_member Test_Point4D_w_o;
+corto_enum Test_TestEnum_o;
+int32_t* Test_TestEnum_E_A_o;
+int32_t* Test_TestEnum_E_B_o;
+int32_t* Test_TestEnum_E_C_o;
+corto_enum Test_TestMask_o;
+int32_t* Test_TestMask_M_A_o;
+int32_t* Test_TestMask_M_B_o;
+int32_t* Test_TestMask_M_C_o;
 corto_struct Test_Transform_o;
 corto_member Test_Transform_name_o;
 corto_member Test_Transform_position_o;
 corto_member Test_Transform_rotation_o;
+corto_member Test_Transform_test_enum_o;
 corto_function Test_WHAT_o;
 corto_method Test_Point4D_add_o;
 corto_method Test_Point3D_add_o;
@@ -280,6 +289,124 @@ int Test_load(void) {
         }
     }
 
+    Test_TestEnum_o = corto_enum(corto_declareChild(Test_o, "TestEnum", corto_enum_o));
+    if (!Test_TestEnum_o) {
+        corto_error("Test_load: failed to declare 'Test_TestEnum_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    Test_TestEnum_E_A_o = corto_constant(corto_declareChild(Test_TestEnum_o, "E_A", corto_constant_o));
+    if (!Test_TestEnum_E_A_o) {
+        corto_error("Test_load: failed to declare 'Test_TestEnum_E_A_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_TestEnum_E_A_o, CORTO_VALID)) {
+        (*Test_TestEnum_E_A_o) = 0;
+        if (corto_define(Test_TestEnum_E_A_o)) {
+            corto_error("Test_load: failed to define 'Test_TestEnum_E_A_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    Test_TestEnum_E_B_o = corto_constant(corto_declareChild(Test_TestEnum_o, "E_B", corto_constant_o));
+    if (!Test_TestEnum_E_B_o) {
+        corto_error("Test_load: failed to declare 'Test_TestEnum_E_B_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_TestEnum_E_B_o, CORTO_VALID)) {
+        (*Test_TestEnum_E_B_o) = 1;
+        if (corto_define(Test_TestEnum_E_B_o)) {
+            corto_error("Test_load: failed to define 'Test_TestEnum_E_B_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    Test_TestEnum_E_C_o = corto_constant(corto_declareChild(Test_TestEnum_o, "E_C", corto_constant_o));
+    if (!Test_TestEnum_E_C_o) {
+        corto_error("Test_load: failed to declare 'Test_TestEnum_E_C_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_TestEnum_E_C_o, CORTO_VALID)) {
+        (*Test_TestEnum_E_C_o) = 2;
+        if (corto_define(Test_TestEnum_E_C_o)) {
+            corto_error("Test_load: failed to define 'Test_TestEnum_E_C_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (!corto_checkState(Test_TestEnum_o, CORTO_VALID)) {
+        if (corto_define(Test_TestEnum_o)) {
+            corto_error("Test_load: failed to define 'Test_TestEnum_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (corto_type(Test_TestEnum_o)->size != sizeof(Test_TestEnum)) {
+        corto_error("Test_load: calculated size '%d' of type 'Test_TestEnum_o' doesn't match C-type size '%d'", corto_type(Test_TestEnum_o)->size, sizeof(Test_TestEnum));
+    }
+
+    Test_TestMask_o = corto_enum(corto_declareChild(Test_o, "TestMask", corto_enum_o));
+    if (!Test_TestMask_o) {
+        corto_error("Test_load: failed to declare 'Test_TestMask_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    Test_TestMask_M_A_o = corto_constant(corto_declareChild(Test_TestMask_o, "M_A", corto_constant_o));
+    if (!Test_TestMask_M_A_o) {
+        corto_error("Test_load: failed to declare 'Test_TestMask_M_A_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_TestMask_M_A_o, CORTO_VALID)) {
+        (*Test_TestMask_M_A_o) = 1;
+        if (corto_define(Test_TestMask_M_A_o)) {
+            corto_error("Test_load: failed to define 'Test_TestMask_M_A_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    Test_TestMask_M_B_o = corto_constant(corto_declareChild(Test_TestMask_o, "M_B", corto_constant_o));
+    if (!Test_TestMask_M_B_o) {
+        corto_error("Test_load: failed to declare 'Test_TestMask_M_B_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_TestMask_M_B_o, CORTO_VALID)) {
+        (*Test_TestMask_M_B_o) = 2;
+        if (corto_define(Test_TestMask_M_B_o)) {
+            corto_error("Test_load: failed to define 'Test_TestMask_M_B_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    Test_TestMask_M_C_o = corto_constant(corto_declareChild(Test_TestMask_o, "M_C", corto_constant_o));
+    if (!Test_TestMask_M_C_o) {
+        corto_error("Test_load: failed to declare 'Test_TestMask_M_C_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_TestMask_M_C_o, CORTO_VALID)) {
+        (*Test_TestMask_M_C_o) = 4;
+        if (corto_define(Test_TestMask_M_C_o)) {
+            corto_error("Test_load: failed to define 'Test_TestMask_M_C_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (!corto_checkState(Test_TestMask_o, CORTO_VALID)) {
+        if (corto_define(Test_TestMask_o)) {
+            corto_error("Test_load: failed to define 'Test_TestMask_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
+    if (corto_type(Test_TestMask_o)->size != sizeof(Test_TestMask)) {
+        corto_error("Test_load: calculated size '%d' of type 'Test_TestMask_o' doesn't match C-type size '%d'", corto_type(Test_TestMask_o)->size, sizeof(Test_TestMask));
+    }
+
     Test_Transform_o = corto_struct(corto_declareChild(Test_o, "Transform", corto_struct_o));
     if (!Test_Transform_o) {
         corto_error("Test_load: failed to declare 'Test_Transform_o' (%s)", corto_lasterr());
@@ -318,6 +445,26 @@ int Test_load(void) {
         goto error;
     }
     
+    Test_Transform_test_enum_o = corto_member(corto_declareChild(Test_Transform_o, "test_enum", corto_member_o));
+    if (!Test_Transform_test_enum_o) {
+        corto_error("Test_load: failed to declare 'Test_Transform_test_enum_o' (%s)", corto_lasterr());
+        goto error;
+    }
+    
+    if (!corto_checkState(Test_Transform_test_enum_o, CORTO_VALID)) {
+        Test_Transform_test_enum_o->type = corto_type((corto_claim(Test_TestEnum_o), Test_TestEnum_o));
+        Test_Transform_test_enum_o->modifiers = 0x0;
+        Test_Transform_test_enum_o->unit = NULL;
+        Test_Transform_test_enum_o->state = 0x5;
+        Test_Transform_test_enum_o->stateCondExpr = NULL;
+        Test_Transform_test_enum_o->weak = FALSE;
+        Test_Transform_test_enum_o->id = 3;
+        if (corto_define(Test_Transform_test_enum_o)) {
+            corto_error("Test_load: failed to define 'Test_Transform_test_enum_o' (%s)", corto_lasterr());
+            goto error;
+        }
+    }
+
     Test_WHAT_o = corto_function(corto_declareChild(Test_o, "WHAT()", corto_function_o));
     if (!Test_WHAT_o) {
         corto_error("Test_load: failed to declare 'Test_WHAT_o' (%s)", corto_lasterr());
